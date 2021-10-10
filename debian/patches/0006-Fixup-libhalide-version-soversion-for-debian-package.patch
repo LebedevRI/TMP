@@ -1,0 +1,24 @@
+From: Roman Lebedev <lebedev.ri@gmail.com>
+Date: Sat, 9 Oct 2021 23:52:39 +0300
+Subject: Fixup libhalide version/soversion for debian package
+Forwarded: not-needed
+
+---
+ src/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 27d2f84..5a2f0cd 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -380,8 +380,8 @@ target_export_script(Halide
+
+ set_target_properties(Halide PROPERTIES
+                       POSITION_INDEPENDENT_CODE ON
+-                      VERSION ${Halide_VERSION}
+-                      SOVERSION ${Halide_VERSION_MAJOR})
++                      OUTPUT_NAME Halide${Halide_VERSION_MAJOR}
++                      SOVERSION 0)
+
+ target_include_directories(Halide INTERFACE "$<BUILD_INTERFACE:${Halide_BINARY_DIR}/include>")
+ add_dependencies(Halide HalideIncludes)

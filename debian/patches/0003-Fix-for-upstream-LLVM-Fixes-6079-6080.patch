@@ -1,0 +1,42 @@
+From: Steven Johnson <srj@google.com>
+Date: Wed, 9 Jun 2021 08:58:41 -0700
+Subject: Fix for upstream LLVM (Fixes #6079) (#6080)
+
+Forwarded: https://github.com/halide/Halide/pull/6080
+---
+ src/CodeGen_Internal.cpp | 4 ++++
+ src/CodeGen_PTX_Dev.cpp  | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/src/CodeGen_Internal.cpp b/src/CodeGen_Internal.cpp
+index 0661acf..1984af4 100644
+--- a/src/CodeGen_Internal.cpp
++++ b/src/CodeGen_Internal.cpp
+@@ -676,7 +676,11 @@ void get_target_options(const llvm::Module &module, llvm::TargetOptions &options
+     options.HonorSignDependentRoundingFPMathOption = !per_instruction_fast_math_flags;
+     options.NoZerosInBSS = false;
+     options.GuaranteedTailCallOpt = false;
++#if LLVM_VERSION >= 13
++    // nothing
++#else
+     options.StackAlignmentOverride = 0;
++#endif
+     options.FunctionSections = true;
+     options.UseInitArray = true;
+     options.FloatABIType =
+diff --git a/src/CodeGen_PTX_Dev.cpp b/src/CodeGen_PTX_Dev.cpp
+index f46d230..d1c3dd7 100644
+--- a/src/CodeGen_PTX_Dev.cpp
++++ b/src/CodeGen_PTX_Dev.cpp
+@@ -613,7 +613,11 @@ vector<char> CodeGen_PTX_Dev::compile_to_src() {
+     options.HonorSignDependentRoundingFPMathOption = false;
+     options.NoZerosInBSS = false;
+     options.GuaranteedTailCallOpt = false;
++#if LLVM_VERSION >= 13
++    // nothing
++#else
+     options.StackAlignmentOverride = 0;
++#endif
+ 
+     std::unique_ptr<TargetMachine>
+         target_machine(llvm_target->createTargetMachine(triple.str(),

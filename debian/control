@@ -1,0 +1,72 @@
+Source: halide
+Section: devel
+Priority: optional
+Maintainer: Roman Lebedev <lebedev.ri@gmail.com>
+Build-Depends: debhelper-compat (= 13), cmake, ninja-build,
+               llvm-13-dev, clang-13, libclang-13-dev, liblld-13-dev, libomp-13-dev,
+               libgl-dev, zlib1g-dev, libjpeg-dev, libpng-dev,
+               doxygen
+Standards-Version: 4.6.0
+Homepage: https://halide-lang.org/
+Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian
+Vcs-Git: https://salsa.debian.org/pkg-llvm-team/halide.git -b debian
+Rules-Requires-Root: no
+
+Package: libhalide12-0
+Architecture: any
+Multi-Arch: same
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: fast, portable computation on images and tensors
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ Halide currently targets:
+  * CPU architectures: X86, ARM, MIPS, Hexagon, PowerPC, RISC-V
+  * Operating systems: Linux, Windows, macOS, Android, iOS, Qualcomm QuRT
+  * GPU Compute APIs: CUDA, OpenCL, OpenGL Compute Shaders, Apple Metal,
+                     Microsoft Direct X 12
+ Rather than being a standalone programming language,
+ Halide is embedded in C++. This means you write C++ code that builds
+ an in-memory representation of a Halide pipeline using Halide's C++ API.
+ You can then compile this representation to an object file,
+ or JIT-compile it and run it in the same process.
+
+Package: libhalideaot12-0
+Architecture: all
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         libllvm13
+Description: fast, portable computation on images and tensors (virtual library)
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ Software that uses halide can either rely on just-in-time compilation,
+ in which case it runtime-depends on/links to libhalide, or it can be compiled
+ ahead of time, when building the software, in which case it does not strictly
+ depend on halide. Former software should depend on this package instead, to
+ make it obvious which software needs to be rebuilt with newer halide versions.
+ .
+ This is an empty package.
+
+Package: libhalide12-0-dev
+Architecture: any
+Multi-Arch: same
+Section: libdevel
+Depends: libhalide12-0 (= ${binary:Version}),
+         ${shlibs:Depends}, ${misc:Depends},
+         llvm-13-dev
+Description: fast, portable computation on images and tensors -- Development files
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ This package contains the files necessary to develop against libhalide.
+
+Package: libhalide12-doc
+Architecture: all
+Section: doc
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: fast, portable computation on images and tensors (documentation)
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ This package contains doxygen API documentation and tutorials.

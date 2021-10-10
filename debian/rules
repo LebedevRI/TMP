@@ -1,0 +1,46 @@
+#!/usr/bin/make -f
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+
+HALIDE_VERSION=12
+
+HALIDE_SOVERSION=0
+
+LLVM_VERSION=13
+
+BUILD_DIR=build-debian
+
+%:
+	dh $@ --buildsystem=cmake+ninja --builddirectory=$(BUILD_DIR)
+
+# TODO: perform multistage build with PGO.
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+	-DCMAKE_C_COMPILER=clang-$(LLVM_VERSION) \
+	-DCMAKE_CXX_COMPILER=clang++-$(LLVM_VERSION) \
+	-DCMAKE_C_FLAGS=-g \
+	-DCMAKE_CXX_FLAGS=-g \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+	-DHalide_ENABLE_RTTI=ON \
+	-DHalide_ENABLE_EXCEPTIONS=ON \
+	-DWITH_PYTHON_BINDINGS=OFF \
+	-DHalide_REQUIRE_LLVM_VERSION=$(LLVM_VERSION) \
+	-DLLVM_DIR=/usr/lib/llvm-$(LLVM_VERSION)/lib/cmake/llvm \
+	-DHalide_SHARED_LLVM=ON \
+	-DTARGET_WEBASSEMBLY=OFF \
+	-DWITH_DOCS=ON \
+	-DCMAKE_INSTALL_LIBDIR=lib/$(DEB_HOST_MULTIARCH)/ \
+	-DHalide_INSTALL_PLUGINDIR=lib/$(DEB_HOST_MULTIARCH)/halide$(HALIDE_VERSION)/ \
+	-DCMAKE_INSTALL_INCLUDEDIR=include/halide$(HALIDE_VERSION)/ \
+	-DHalide_INSTALL_CMAKEDIR=lib/$(DEB_HOST_MULTIARCH)/cmake/Halide$(HALIDE_VERSION)/ \
+	-DHalide_INSTALL_HELPERSDIR=lib/$(DEB_HOST_MULTIARCH)/cmake/HalideHelpers$(HALIDE_VERSION)/ \
+	-DCMAKE_INSTALL_BINDIR=lib/$(DEB_HOST_MULTIARCH)/halide$(HALIDE_VERSION)/ \
+	-DHalide_INSTALL_TOOLSDIR=src/halide$(HALIDE_VERSION)/ \
+	-DCMAKE_INSTALL_DOCDIR=share/doc/halide$(HALIDE_VERSION)/
+
+# WARNING: running multiple halide tests in parallel is unsupported!
+override_dh_auto_test:
+	ctest -j1 --test-dir $(BUILD_DIR)
