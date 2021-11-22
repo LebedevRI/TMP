@@ -1,3 +1,9 @@
+halide (13.0.1-1) unstable; urgency=medium
+
+  * Update to newest upstream release
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Mon, 22 Nov 2021 12:39:22 +0300
+
 halide (12.0.1-1) unstable; urgency=medium
 
   * Initial halide package for debian (Closes: #995440)

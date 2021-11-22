@@ -1,5 +1,2 @@
-0001-CMake-install-docs-into-halide-subdirectory-of-doc-d.patch
-0002-Track-argument-change-to-LLVM-s-CreateMaskedLoad.-61.patch
-0003-Fix-for-upstream-LLVM-Fixes-6079-6080.patch
 0005-Remove-unrelevant-prebuild-binaries-to-pacify-lintia.patch
 0006-Fixup-libhalide-version-soversion-for-debian-package.patch
