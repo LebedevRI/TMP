@@ -1,3 +1,9 @@
+halide (13.0.1-2) unstable; urgency=medium
+
+  * Source uploaded 
+
+ -- Sylvestre Ledru <sylvestre@debian.org>  Wed, 24 Nov 2021 16:31:17 +0100
+
 halide (13.0.1-1) unstable; urgency=medium
 
   * Update to newest upstream release
