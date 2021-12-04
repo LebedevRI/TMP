@@ -2,28 +2,44 @@
 
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
-HALIDE_VERSION=13
+HALIDE_VERSION = 13
 
-HALIDE_SOVERSION=0
+HALIDE_SOVERSION = 0
 
-LLVM_VERSION=13
+LLVM_VERSION = 13
 
-BUILD_DIR=build-debian
+CC = clang-$(LLVM_VERSION)
+CXX = clang++-$(LLVM_VERSION)
+
+SOURCE_DIR = $(CURDIR)
+
+BUILD_STAGE ?= 1
+EXTRA_COMPILE_FLAGS ?=
+
+CFLAGS = -g -fuse-ld=lld-$(LLVM_VERSION) $(EXTRA_COMPILE_FLAGS)
+CXXFLAGS = $(CFLAGS)
+
+PROFILE_DIR = $(SOURCE_DIR)/build-profile
+PROFILE_TMP_DIR = $(PROFILE_DIR)/raw
+LLVM_PROFILE_FILE = "$(PROFILE_TMP_DIR)/stage-$(BUILD_STAGE)-%p-%m.profraw"
+PROFILE = $(PROFILE_DIR)/default.profdata
+
+BUILD_DIR_PREFIX = $(SOURCE_DIR)/build
+
+STAGE_BUILD_DIR_PREFIX = $(BUILD_DIR_PREFIX)/stage-$(BUILD_STAGE)
+BUILD_DIR = $(STAGE_BUILD_DIR_PREFIX)/halide
+INSTALL_DIR = $(STAGE_BUILD_DIR_PREFIX)/halide-install
+APPS_BUILD_DIR = $(STAGE_BUILD_DIR_PREFIX)/halide-test-apps
 
 %:
-	dh $@ --buildsystem=cmake+ninja --builddirectory=$(BUILD_DIR)
+	dh $@ --buildsystem=cmake+ninja
 
-# TODO: perform multistage build with PGO.
-
-override_dh_auto_configure:
-	dh_auto_configure -- \
-	-DCMAKE_C_COMPILER=clang-$(LLVM_VERSION) \
-	-DCMAKE_CXX_COMPILER=clang++-$(LLVM_VERSION) \
-	-DCMAKE_C_FLAGS=-g \
-	-DCMAKE_CXX_FLAGS=-g \
-	-DCMAKE_BUILD_TYPE=Release \
+perform_stage_build:
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR) --builddir=$(BUILD_DIR) -- \
+	-DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) \
+	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
+	-DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
 	-DHalide_ENABLE_RTTI=ON \
 	-DHalide_ENABLE_EXCEPTIONS=ON \
 	-DWITH_PYTHON_BINDINGS=OFF \
@@ -41,6 +57,54 @@ override_dh_auto_configure:
 	-DHalide_INSTALL_TOOLSDIR=src/halide$(HALIDE_VERSION)/ \
 	-DCMAKE_INSTALL_DOCDIR=share/doc/halide$(HALIDE_VERSION)/
 
-# WARNING: running multiple halide tests in parallel is unsupported!
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_build --builddir=$(BUILD_DIR)
+
+	# WARNING: running multiple halide tests in parallel is unsupported!
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(BUILD_DIR)
+
+	dh_auto_install --builddir=$(BUILD_DIR) --destdir=$(INSTALL_DIR)
+
+	rm -rf $(BUILD_DIR)
+
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR)/apps/ --builddir=$(APPS_BUILD_DIR) -- \
+	-DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) \
+	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
+	-DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+	-DENABLE_APPS_HANNK=OFF \
+	-DHalide_DIR=$(INSTALL_DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/Halide$(HALIDE_VERSION)/ \
+	-DHalideHelpers_DIR=$(INSTALL_DIR)/usr/lib/$(DEB_HOST_MULTIARCH)/cmake/HalideHelpers$(HALIDE_VERSION)/
+
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_build --builddir=$(APPS_BUILD_DIR)
+
+	# WARNING: running multiple halide tests in parallel is unsupported!
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(APPS_BUILD_DIR)
+
+	rm -rf $(APPS_BUILD_DIR)
+
+override_dh_auto_configure:
+	# Nothing to do. Because of multi-stage build, everything happens in override_dh_auto_build.
+
+override_dh_auto_build:
+	BUILD_STAGE=0 EXTRA_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=2.0" $(MAKE) -f debian/rules perform_stage_build
+	rm -rf $(BUILD_DIR_PREFIX)
+	llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
+	rm -rf $(PROFILE_TMP_DIR)
+
+	# FIXME: why doesn't this work?
+	# BUILD_STAGE=<placeholder> EXTRA_COMPILE_FLAGS="-fprofile-use=$(PROFILE) -fcs-profile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=15.0" $(MAKE) -f debian/rules perform_stage_build
+	# rm -rf $(BUILD_DIR_PREFIX)
+	# rm $(PROFILE)
+	# llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
+	# FIXME: should we merge the non-CS profile with CS profile? how?
+	# rm -rf $(PROFILE_TMP_DIR)
+
+	EXTRA_COMPILE_FLAGS="-fprofile-use=$(PROFILE)" $(MAKE) -f debian/rules perform_stage_build
+
 override_dh_auto_test:
-	ctest -j1 --test-dir $(BUILD_DIR)
+	# Nothing to do. Because of multi-stage build, everything happens in override_dh_auto_build.
+
+override_dh_auto_install:
+	# Nothing to do. Because of multi-stage build, everything happens in override_dh_auto_build.
+
+override_dh_install:
+	dh_install --sourcedir=$(INSTALL_DIR)
