@@ -3,7 +3,8 @@ halide (13.0.1-3) unstable; urgency=medium
   * Use LLVM LLD linker
   * Also build halide test apps
   * Perform 2-stage build (PGO)
-  * Mark `libhalide13-doc` as `Multi-Arch: foreign`, as suggested by multiarch hinter
+  * Mark `libhalide13-doc` as `Multi-Arch: foreign`, as
+    suggested by multiarch hinter
 
  -- Roman Lebedev <lebedev.ri@gmail.com>  Sat, 04 Dec 2021 13:20:48 +0300
 
