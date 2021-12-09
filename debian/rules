@@ -8,6 +8,26 @@ HALIDE_SOVERSION = 0
 
 LLVM_VERSION = 13
 
+WITH_LTO = ON
+WITH_TESTS = ON
+WITH_PGO = ON
+
+ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	# Respect nocheck.
+	WITH_TESTS = OFF
+	# If we aren't allowed to run tests, then certainly no PGO either.
+	WITH_PGO = OFF
+endif
+
+DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
+
+ifeq ($(DEB_HOST_ARCH),riscv64)
+	# Constrained builders, let's not bother with LTO for now.
+	WITH_LTO = OFF
+	# There is no LLVM compiler-rt library on riscv64, so PGO is impossible.
+	WITH_PGO = OFF
+endif
+
 CC = clang-$(LLVM_VERSION)
 CXX = clang++-$(LLVM_VERSION)
 
@@ -38,7 +58,8 @@ perform_stage_build:
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR) --builddir=$(BUILD_DIR) -- \
 	-DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) \
 	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
-	-DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=$(WITH_LTO) \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	-DHalide_ENABLE_RTTI=ON \
 	-DHalide_ENABLE_EXCEPTIONS=ON \
@@ -47,6 +68,7 @@ perform_stage_build:
 	-DLLVM_DIR=/usr/lib/llvm-$(LLVM_VERSION)/lib/cmake/llvm \
 	-DHalide_SHARED_LLVM=ON \
 	-DTARGET_WEBASSEMBLY=OFF \
+	-DWITH_TESTS=$(WITH_TESTS) \
 	-DWITH_DOCS=ON \
 	-DCMAKE_INSTALL_LIBDIR=lib/$(DEB_HOST_MULTIARCH)/ \
 	-DHalide_INSTALL_PLUGINDIR=lib/$(DEB_HOST_MULTIARCH)/halide$(HALIDE_VERSION)/ \
@@ -59,13 +81,16 @@ perform_stage_build:
 
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_build --builddir=$(BUILD_DIR)
 
+ifneq ($(WITH_TESTS),OFF)
 	# WARNING: running multiple halide tests in parallel is unsupported!
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(BUILD_DIR)
+endif
 
 	dh_auto_install --builddir=$(BUILD_DIR) --destdir=$(INSTALL_DIR)
 
 	rm -rf $(BUILD_DIR)
 
+ifneq ($(WITH_TESTS),OFF)
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR)/apps/ --builddir=$(APPS_BUILD_DIR) -- \
 	-DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) \
 	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
@@ -80,11 +105,13 @@ perform_stage_build:
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(APPS_BUILD_DIR)
 
 	rm -rf $(APPS_BUILD_DIR)
+endif
 
 override_dh_auto_configure:
 	# Nothing to do. Because of multi-stage build, everything happens in override_dh_auto_build.
 
 override_dh_auto_build:
+ifneq ($(WITH_PGO),OFF)
 	BUILD_STAGE=0 EXTRA_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=2.0" $(MAKE) -f debian/rules perform_stage_build
 	rm -rf $(BUILD_DIR_PREFIX)
 	llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
@@ -99,6 +126,9 @@ override_dh_auto_build:
 	# rm -rf $(PROFILE_TMP_DIR)
 
 	EXTRA_COMPILE_FLAGS="-fprofile-use=$(PROFILE)" $(MAKE) -f debian/rules perform_stage_build
+else
+	$(MAKE) -f debian/rules perform_stage_build
+endif
 
 override_dh_auto_test:
 	# Nothing to do. Because of multi-stage build, everything happens in override_dh_auto_build.

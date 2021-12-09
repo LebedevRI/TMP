@@ -6,6 +6,7 @@ halide (13.0.1-4) unstable; urgency=medium
 
   [ Roman Lebedev ]
   * Hopefully fix i386 build - add missing preprocessor check for SSE.
+  * Hopefully fix riscv64 build - disable PGO/LTO.
 
  -- Roman Lebedev <lebedev.ri@gmail.com>  Mon, 06 Dec 2021 23:34:00 +0300
 
