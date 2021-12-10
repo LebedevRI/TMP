@@ -22,6 +22,8 @@ endif
 DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 ifeq ($(DEB_HOST_ARCH),riscv64)
+	# Linker relaxation is not implemented in LLD.
+	EXTRA_COMPILE_FLAGS = -mno-relax
 	# Constrained builders, let's not bother with LTO for now.
 	WITH_LTO = OFF
 	# There is no LLVM compiler-rt library on riscv64, so PGO is impossible.
@@ -34,9 +36,9 @@ CXX = clang++-$(LLVM_VERSION)
 SOURCE_DIR = $(CURDIR)
 
 BUILD_STAGE ?= 1
-EXTRA_COMPILE_FLAGS ?=
+STAGE_COMPILE_FLAGS ?=
 
-CFLAGS = -g -fuse-ld=lld-$(LLVM_VERSION) $(EXTRA_COMPILE_FLAGS)
+CFLAGS = -g -fuse-ld=lld-$(LLVM_VERSION) $(EXTRA_COMPILE_FLAGS) $(STAGE_COMPILE_FLAGS)
 CXXFLAGS = $(CFLAGS)
 
 PROFILE_DIR = $(SOURCE_DIR)/build-profile
@@ -56,8 +58,10 @@ APPS_BUILD_DIR = $(STAGE_BUILD_DIR_PREFIX)/halide-test-apps
 
 perform_stage_build:
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR) --builddir=$(BUILD_DIR) -- \
-	-DCMAKE_C_COMPILER=$(CC) -DCMAKE_CXX_COMPILER=$(CXX) \
-	-DCMAKE_C_FLAGS="$(CFLAGS)" -DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
+	-DCMAKE_C_COMPILER=$(CC) \
+	-DCMAKE_CXX_COMPILER=$(CXX) \
+	-DCMAKE_C_FLAGS="$(CFLAGS)" \
+	-DCMAKE_CXX_FLAGS="$(CXXFLAGS)" \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INTERPROCEDURAL_OPTIMIZATION=$(WITH_LTO) \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
@@ -112,20 +116,20 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 ifneq ($(WITH_PGO),OFF)
-	BUILD_STAGE=0 EXTRA_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=2.0" $(MAKE) -f debian/rules perform_stage_build
+	BUILD_STAGE=0 STAGE_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=2.0" $(MAKE) -f debian/rules perform_stage_build
 	rm -rf $(BUILD_DIR_PREFIX)
 	llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
 	rm -rf $(PROFILE_TMP_DIR)
 
 	# FIXME: why doesn't this work?
-	# BUILD_STAGE=<placeholder> EXTRA_COMPILE_FLAGS="-fprofile-use=$(PROFILE) -fcs-profile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=15.0" $(MAKE) -f debian/rules perform_stage_build
+	# BUILD_STAGE=<placeholder> STAGE_COMPILE_FLAGS="-fprofile-use=$(PROFILE) -fcs-profile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=15.0" $(MAKE) -f debian/rules perform_stage_build
 	# rm -rf $(BUILD_DIR_PREFIX)
 	# rm $(PROFILE)
 	# llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
 	# FIXME: should we merge the non-CS profile with CS profile? how?
 	# rm -rf $(PROFILE_TMP_DIR)
 
-	EXTRA_COMPILE_FLAGS="-fprofile-use=$(PROFILE)" $(MAKE) -f debian/rules perform_stage_build
+	STAGE_COMPILE_FLAGS="-fprofile-use=$(PROFILE)" $(MAKE) -f debian/rules perform_stage_build
 else
 	$(MAKE) -f debian/rules perform_stage_build
 endif
