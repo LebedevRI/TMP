@@ -11,6 +11,7 @@ LLVM_VERSION = 13
 WITH_LTO = ON
 WITH_TESTS = ON
 WITH_PGO = ON
+WITH_LLD = ON
 
 ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# Respect nocheck.
@@ -21,9 +22,25 @@ endif
 
 DEB_HOST_ARCH := $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
+ifeq ($(DEB_HOST_ARCH),powerpc)
+	# No LLD.
+	WITH_LLD = OFF
+endif
+
+ifeq ($(DEB_HOST_ARCH),mips64el)
+	# LLD does not seem to work out-of-the box.
+	WITH_LLD = OFF
+endif
+
+ifeq ($(DEB_HOST_ARCH),ppc64)
+	# LLD does not seem to work out-of-the box.
+	WITH_LLD = OFF
+endif
+
 ifeq ($(DEB_HOST_ARCH),riscv64)
-	# Linker relaxation is not implemented in LLD.
-	EXTRA_COMPILE_FLAGS = -mno-relax
+	# Linker relaxation is not implemented, need to compile with -mno-relax,
+	# but then can't link to libs that aren't compiled with -mno-relax.
+	WITH_LLD = OFF
 	# Constrained builders, let's not bother with LTO for now.
 	WITH_LTO = OFF
 	# There is no LLVM compiler-rt library on riscv64, so PGO is impossible.
@@ -38,7 +55,12 @@ SOURCE_DIR = $(CURDIR)
 BUILD_STAGE ?= 1
 STAGE_COMPILE_FLAGS ?=
 
-CFLAGS = -g -fuse-ld=lld-$(LLVM_VERSION) $(EXTRA_COMPILE_FLAGS) $(STAGE_COMPILE_FLAGS)
+CFLAGS = -g $(STAGE_COMPILE_FLAGS)
+
+ifneq ($(WITH_LLD),OFF)
+	CFLAGS += -fuse-ld=lld-$(LLVM_VERSION)
+endif
+
 CXXFLAGS = $(CFLAGS)
 
 PROFILE_DIR = $(SOURCE_DIR)/build-profile

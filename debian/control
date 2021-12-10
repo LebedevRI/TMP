@@ -3,9 +3,10 @@ Section: devel
 Priority: optional
 Maintainer: Roman Lebedev <lebedev.ri@gmail.com>
 Build-Depends: debhelper-compat (= 13), cmake, ninja-build, llvm-13,
-               llvm-13-dev, clang-13, libclang-13-dev, lld-13, liblld-13-dev,
-               libomp-13-dev, libgl-dev, zlib1g-dev, libjpeg-dev, libpng-dev,
-               doxygen, libxml2-dev, libopenblas-dev
+               llvm-13-dev, clang-13, libclang-13-dev,
+               lld-13 [!powerpc !mips64el !ppc64 !riscv64],
+               liblld-13-dev, libomp-13-dev, libgl-dev, zlib1g-dev, libjpeg-dev,
+               libpng-dev, doxygen, libxml2-dev, libopenblas-dev
 Standards-Version: 4.6.0
 Homepage: https://halide-lang.org/
 Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian

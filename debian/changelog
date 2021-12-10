@@ -1,7 +1,7 @@
 halide (13.0.2-1) unstable; urgency=medium
 
   * Update to latest upstream release, drop upstreamed patches.
-  * Another attempt at fixing RISC-V build.
+  * Another attempt at fixing RISC-V / etc LLD-related build failures.
 
  -- Roman Lebedev <lebedev.ri@gmail.com>  Fri, 10 Dec 2021 22:02:48 +0300
 
