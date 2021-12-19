@@ -1,0 +1,49 @@
+From: Roman Lebedev <lebedev.ri@gmail.com>
+Date: Sun, 19 Dec 2021 03:59:16 +0300
+Subject: Try to fix riscv64 build (#6503)
+
+https://buildd.debian.org/status/fetch.php?pkg=halide&arch=riscv64&ver=13.0.2-1&stamp=1639833165&raw=0
+
+```
+[1283/3260] /usr/bin/clang++-13 -DHALIDE_ENABLE_RTTI -DHALIDE_WITH_EXCEPTIONS -DHalide_EXPORTS -DLLVM_VERSION=130 -DWITH_AARCH64 -DWITH_AMDGPU -DWITH_ARM -DWITH_D3D12 -DWITH_HEXAGON -DWITH_INTROSPECTION -DWITH_METAL -DWITH_MIPS -DWITH_NVPTX -DWITH_OPENCL -DWITH_OPENGLCOMPUTE -DWITH_POWERPC -DWITH_RISCV -DWITH_WEBASSEMBLY -DWITH_X86 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/usr/lib/llvm-13/include -g -O3 -DNDEBUG -fPIC -Wall -Wcast-qual -Wignored-qualifiers -Woverloaded-virtual -Winconsistent-missing-destructor-override -Winconsistent-missing-override -Wno-deprecated-declarations -Wno-double-promotion -Wno-float-conversion -Wno-float-equal -Wno-missing-field-initializers -Wno-old-style-cast -Wno-shadow -Wno-sign-conversion -Wno-switch-enum -Wno-undef -Wno-unused-function -Wno-unused-macros -Wno-unused-parameter -Wno-c++98-compat-pedantic -Wno-c++98-compat -Wno-cast-align -Wno-comma -Wno-covered-switch-default -Wno-documentation-unknown-command -Wno-documentation -Wno-exit-time-destructors -Wno-global-constructors -Wno-implicit-float-conversion -Wno-implicit-int-conversion -Wno-implicit-int-float-conversion -Wno-missing-prototypes -Wno-nonportable-system-include-path -Wno-reserved-id-macro -Wno-return-std-move-in-c++11 -Wno-shadow-field-in-constructor -Wno-shadow-field -Wno-shorten-64-to-32 -Wno-undefined-func-template -Wno-unused-member-function -Wno-unused-template -pthread -std=c++17 -MD -MT src/CMakeFiles/Halide.dir/Target.cpp.o -MF src/CMakeFiles/Halide.dir/Target.cpp.o.d -o src/CMakeFiles/Halide.dir/Target.cpp.o -c /<<PKGBUILDDIR>>/src/Target.cpp
+FAILED: src/CMakeFiles/Halide.dir/Target.cpp.o
+/usr/bin/clang++-13 -DHALIDE_ENABLE_RTTI -DHALIDE_WITH_EXCEPTIONS -DHalide_EXPORTS -DLLVM_VERSION=130 -DWITH_AARCH64 -DWITH_AMDGPU -DWITH_ARM -DWITH_D3D12 -DWITH_HEXAGON -DWITH_INTROSPECTION -DWITH_METAL -DWITH_MIPS -DWITH_NVPTX -DWITH_OPENCL -DWITH_OPENGLCOMPUTE -DWITH_POWERPC -DWITH_RISCV -DWITH_WEBASSEMBLY -DWITH_X86 -D_GNU_SOURCE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -I/usr/lib/llvm-13/include -g -O3 -DNDEBUG -fPIC -Wall -Wcast-qual -Wignored-qualifiers -Woverloaded-virtual -Winconsistent-missing-destructor-override -Winconsistent-missing-override -Wno-deprecated-declarations -Wno-double-promotion -Wno-float-conversion -Wno-float-equal -Wno-missing-field-initializers -Wno-old-style-cast -Wno-shadow -Wno-sign-conversion -Wno-switch-enum -Wno-undef -Wno-unused-function -Wno-unused-macros -Wno-unused-parameter -Wno-c++98-compat-pedantic -Wno-c++98-compat -Wno-cast-align -Wno-comma -Wno-covered-switch-default -Wno-documentation-unknown-command -Wno-documentation -Wno-exit-time-destructors -Wno-global-constructors -Wno-implicit-float-conversion -Wno-implicit-int-conversion -Wno-implicit-int-float-conversion -Wno-missing-prototypes -Wno-nonportable-system-include-path -Wno-reserved-id-macro -Wno-return-std-move-in-c++11 -Wno-shadow-field-in-constructor -Wno-shadow-field -Wno-shorten-64-to-32 -Wno-undefined-func-template -Wno-unused-member-function -Wno-unused-template -pthread -std=c++17 -MD -MT src/CMakeFiles/Halide.dir/Target.cpp.o -MF src/CMakeFiles/Halide.dir/Target.cpp.o.d -o src/CMakeFiles/Halide.dir/Target.cpp.o -c /<<PKGBUILDDIR>>/src/Target.cpp
+warning: unknown warning option '-Wno-return-std-move-in-c++11' [-Wunknown-warning-option]
+/<<PKGBUILDDIR>>/src/Target.cpp:114:5: error: use of undeclared identifier 'cpuid'
+    cpuid(info, 1, 0);
+    ^
+/<<PKGBUILDDIR>>/src/Target.cpp:148:9: error: use of undeclared identifier 'cpuid'
+        cpuid(info2, 7, 0);
+        ^
+/<<PKGBUILDDIR>>/src/Target.cpp:181:17: error: use of undeclared identifier 'cpuid'
+                cpuid(info3, 7, 1);
+                ^
+1 warning and 3 errors generated.
+```
+... which doesn't make sense because that code is supposed to only compile
+for X86. But that is because RISCV header guard is wrong,
+https://github.com/riscv-non-isa/riscv-toolchain-conventions
+says:
+```
+C/C++ preprocessor definitions
+* __riscv: defined for any RISC-V target. Older versions of the GCC toolchain defined __riscv__.
+```
+
+Forwarded: https://github.com/halide/Halide/pull/6503
+---
+ src/Target.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Target.cpp b/src/Target.cpp
+index 4e21db6..f126af8 100644
+--- a/src/Target.cpp
++++ b/src/Target.cpp
+@@ -78,7 +78,7 @@ Target calculate_host_target() {
+     int bits = use_64_bits ? 64 : 32;
+     std::vector<Target::Feature> initial_features;
+ 
+-#if __riscv__
++#if __riscv
+     Target::Arch arch = Target::RISCV;
+ #else
+ #if __mips__ || __mips || __MIPS__

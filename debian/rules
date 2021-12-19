@@ -109,7 +109,7 @@ perform_stage_build:
 
 ifneq ($(WITH_TESTS),OFF)
 	# WARNING: running multiple halide tests in parallel is unsupported!
-	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(BUILD_DIR)
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --repeat until-pass:3 --test-dir $(BUILD_DIR)
 endif
 
 	dh_auto_install --builddir=$(BUILD_DIR) --destdir=$(INSTALL_DIR)
@@ -128,7 +128,7 @@ ifneq ($(WITH_TESTS),OFF)
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_build --builddir=$(APPS_BUILD_DIR)
 
 	# WARNING: running multiple halide tests in parallel is unsupported!
-	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --test-dir $(APPS_BUILD_DIR)
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1 --repeat until-pass:3 --test-dir $(APPS_BUILD_DIR)
 
 	rm -rf $(APPS_BUILD_DIR)
 endif
