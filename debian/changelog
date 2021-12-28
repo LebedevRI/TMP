@@ -2,6 +2,8 @@ halide (13.0.2-3) unstable; urgency=medium
 
   * Yet another RISC-V build fix
   * Don't hard-require libomp, it isn't strictly needed
+  * Explicitly overrule DEB_BUILD_MAINT_OPTIONS's request to do LTO,
+    since we do our own LTO handling. Might fix Ubuntu build.
 
  -- Roman Lebedev <lebedev.ri@gmail.com>  Wed, 29 Dec 2021 00:51:01 +0300
 

@@ -1,5 +1,8 @@
 #!/usr/bin/make -f
 
+# We do not care about distro's LTO preferences.
+DEB_BUILD_MAINT_OPTIONS += optimize=-lto
+
 DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 HALIDE_VERSION = 13
