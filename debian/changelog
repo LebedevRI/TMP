@@ -1,3 +1,10 @@
+halide (13.0.2-3) unstable; urgency=medium
+
+  * Yet another RISC-V build fix
+  * Don't hard-require libomp, it isn't strictly needed
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Wed, 29 Dec 2021 00:51:01 +0300
+
 halide (13.0.2-2) unstable; urgency=medium
 
   * Another RISC-V build fix
