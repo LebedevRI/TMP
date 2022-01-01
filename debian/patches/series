@@ -1,4 +1,2 @@
 0005-Remove-unrelevant-prebuild-binaries-to-pacify-lintia.patch
 0006-Fixup-libhalide-version-soversion-for-debian-package.patch
-0003-Try-to-fix-riscv64-build-6503.patch
-0004-Mullapudi2016-don-t-hardcode-the-list-of-supported-t.patch

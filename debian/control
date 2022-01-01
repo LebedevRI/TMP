@@ -2,13 +2,30 @@ Source: halide
 Section: devel
 Priority: optional
 Maintainer: Roman Lebedev <lebedev.ri@gmail.com>
-Build-Depends: debhelper-compat (= 13), cmake, ninja-build, llvm-13,
-               llvm-13-dev, clang-13, libclang-13-dev,
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3,
+               python3-dev,
+               libpython3-dev,
+               pybind11-dev,
+               python3-numpy,
+               python3-imageio,
+               cmake,
+               ninja-build,
+               llvm-13,
+               llvm-13-dev,
+               clang-13,
+               libclang-13-dev,
                lld-13 [!powerpc !mips64el !ppc64 !riscv64],
                liblld-13-dev,
                libomp-13-dev [!armel !mipsel !s390x !sparc64 !x32],
-               libgl-dev, zlib1g-dev, libjpeg-dev,
-               libpng-dev, doxygen, libxml2-dev, libopenblas-dev
+               libgl-dev,
+               zlib1g-dev,
+               libjpeg-dev,
+               libpng-dev,
+               doxygen,
+               libxml2-dev,
+               libopenblas-dev
 Standards-Version: 4.6.0
 Homepage: https://halide-lang.org/
 Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian
@@ -58,6 +75,7 @@ Section: libdevel
 Depends: libhalide13-0 (= ${binary:Version}),
          ${shlibs:Depends}, ${misc:Depends},
          llvm-13-dev
+Suggests: libhalide13-doc, halide13-api-doc
 Description: fast, portable computation on images and tensors -- Development files
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
@@ -69,8 +87,48 @@ Architecture: all
 Multi-Arch: foreign
 Section: doc
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: fast, portable computation on images and tensors (documentation)
+Enhances: libhalide13-0-dev
+Description: fast, portable computation on images and tensors (C++ documentation)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
  .
- This package contains doxygen API documentation and tutorials.
+ This package contains README's and tutorials for using Halide from C++.
+
+Package: halide13-api-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Enhances: libhalide13-0-dev
+Description: fast, portable computation on images and tensors (Doxygen documentation)
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ This package contains Doxygen-generated API documentation.
+
+Package: python3-halide
+Architecture: any
+Multi-Arch: same
+Section: python
+Depends: libhalide13-0 (= ${binary:Version}),
+         ${shlibs:Depends}, ${misc:Depends},
+         ${python3:Depends}
+Suggests: python3-halide-doc
+Description: fast, portable computation on images and tensors -- Python3 bindings
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ This package contains provides a Python binding that provides full support
+ for writing Halide embedded in Python without C++.
+
+Package: python3-halide-doc
+Architecture: all
+Multi-Arch: foreign
+Section: doc
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Enhances: python3-halide
+Description: fast, portable computation on images and tensors (Python3 documentation)
+ Halide is a programming language designed to make it easier to write
+ high-performance image and array processing code on modern machines.
+ .
+ This package contains tutorials for writing Halide embedded in Python.
