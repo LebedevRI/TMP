@@ -542,8 +542,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
 
 set_target_properties(Halide PROPERTIES
                       POSITION_INDEPENDENT_CODE ON
-                      VERSION ${Halide_VERSION}
-                      SOVERSION ${Halide_SOVERSION_OVERRIDE})
+                      SOVERSION ${Halide_SOVERSION_OVERRIDE}
+                      OUTPUT_NAME Halide${Halide_VERSION_MAJOR})
 
 # Note that we (deliberately) redeclare these versions here, even though the macros
 # with identical versions are expected to be defined in source; this allows us to
