@@ -389,8 +389,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
 
 set_target_properties(Halide PROPERTIES
                       POSITION_INDEPENDENT_CODE ON
-                      VERSION ${Halide_VERSION}
-                      SOVERSION ${Halide_SOVERSION_OVERRIDE})
+                      SOVERSION ${Halide_SOVERSION_OVERRIDE}
+                      OUTPUT_NAME Halide${Halide_VERSION_MAJOR})
 
 target_include_directories(Halide INTERFACE "$<BUILD_INTERFACE:${Halide_BINARY_DIR}/include>")
 add_dependencies(Halide HalideIncludes)
