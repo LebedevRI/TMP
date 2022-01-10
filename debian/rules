@@ -32,6 +32,22 @@ endif
 ifeq ($(DEB_HOST_ARCH),mips64el)
 	# LLD does not seem to work out-of-the box.
 	WITH_LLD = OFF
+	# LLVMgold.so not found, don't bother for now.
+	WITH_PGO = OFF
+endif
+
+ifeq ($(DEB_HOST_ARCH),s390x)
+	# LLD does not seem to work out-of-the box.
+	WITH_LLD = OFF
+	# Don't bother for now.
+	WITH_PGO = OFF
+endif
+
+ifeq ($(DEB_HOST_ARCH),sparc64)
+	# LLD does not seem to work out-of-the box.
+	WITH_LLD = OFF
+	# Don't bother for now.
+	WITH_PGO = OFF
 endif
 
 ifeq ($(DEB_HOST_ARCH),ppc64)

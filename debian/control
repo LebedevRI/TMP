@@ -17,7 +17,6 @@ Build-Depends: debhelper-compat (= 13),
                clang-13,
                libclang-13-dev,
                lld-13 [!powerpc !mips64el !ppc64 !riscv64],
-               liblld-13-dev,
                libomp-13-dev [!armel !mipsel !s390x !sparc64 !x32],
                libgl-dev,
                zlib1g-dev,
@@ -25,7 +24,8 @@ Build-Depends: debhelper-compat (= 13),
                libpng-dev,
                doxygen,
                libxml2-dev,
-               libopenblas-dev
+               libopenblas-dev   [!armel !mipsel !x32],
+               libatlas-base-dev [ armel  mipsel  ]
 Standards-Version: 4.6.0
 Homepage: https://halide-lang.org/
 Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian
@@ -100,6 +100,8 @@ Multi-Arch: foreign
 Section: doc
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Enhances: libhalide13-0-dev
+Breaks:   libhalide13-doc (<< 13.0.3)
+Replaces: libhalide13-doc (<< 13.0.3)
 Description: fast, portable computation on images and tensors (Doxygen documentation)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
