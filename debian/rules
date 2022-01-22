@@ -11,10 +11,36 @@ HALIDE_SOVERSION = 0
 
 LLVM_VERSION = 13
 
-WITH_LTO = ON
+WITH_LTO = OFF
 WITH_TESTS = ON
-WITH_PGO = ON
-WITH_LLD = ON
+WITH_PGO = OFF
+WITH_LLD = OFF
+
+ifeq ($(DEB_HOST_ARCH),amd64)
+	WITH_LTO = ON
+	WITH_TESTS = ON
+	WITH_PGO = ON
+	WITH_LLD = ON
+endif
+
+ifeq ($(DEB_HOST_ARCH),i386)
+	WITH_LTO = ON
+	WITH_TESTS = ON
+	WITH_PGO = ON
+	WITH_LLD = ON
+endif
+
+ifeq ($(DEB_HOST_ARCH),arm64)
+	WITH_LTO = ON
+	WITH_TESTS = ON
+	WITH_PGO = ON
+	WITH_LLD = ON
+endif
+
+ifneq (,$(filter nolto,$(DEB_BUILD_OPTIONS)))
+	# Respect nolto.
+	WITH_LTO = OFF
+endif
 
 ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	# Respect nocheck.
@@ -23,45 +49,8 @@ ifneq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	WITH_PGO = OFF
 endif
 
-
-ifeq ($(DEB_HOST_ARCH),powerpc)
-	# No LLD.
-	WITH_LLD = OFF
-endif
-
-ifeq ($(DEB_HOST_ARCH),mips64el)
-	# LLD does not seem to work out-of-the box.
-	WITH_LLD = OFF
-	# LLVMgold.so not found, don't bother for now.
-	WITH_PGO = OFF
-endif
-
-ifeq ($(DEB_HOST_ARCH),s390x)
-	# LLD does not seem to work out-of-the box.
-	WITH_LLD = OFF
-	# Don't bother for now.
-	WITH_PGO = OFF
-endif
-
-ifeq ($(DEB_HOST_ARCH),sparc64)
-	# LLD does not seem to work out-of-the box.
-	WITH_LLD = OFF
-	# Don't bother for now.
-	WITH_PGO = OFF
-endif
-
-ifeq ($(DEB_HOST_ARCH),ppc64)
-	# LLD does not seem to work out-of-the box.
-	WITH_LLD = OFF
-endif
-
-ifeq ($(DEB_HOST_ARCH),riscv64)
-	# Linker relaxation is not implemented, need to compile with -mno-relax,
-	# but then can't link to libs that aren't compiled with -mno-relax.
-	WITH_LLD = OFF
-	# Constrained builders, let's not bother with LTO for now.
-	WITH_LTO = OFF
-	# There is no LLVM compiler-rt library on riscv64, so PGO is impossible.
+ifneq (,$(filter nopgo,$(DEB_BUILD_OPTIONS)))
+	# Respect nopgo.
 	WITH_PGO = OFF
 endif
 
