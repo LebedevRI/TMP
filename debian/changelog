@@ -1,14 +1,11 @@
-halide (13.0.4-3) UNRELEASED; urgency=medium
+halide (14.0.0-1) unstable; urgency=medium
 
+  * New upstream major release.
+  * Build against LLVM14.
+  * Effectively disable flaky performance_boundary_conditions test.
   * Strip unusual field spacing from debian/control.
 
- -- Debian Janitor <janitor@jelmer.uk>  Mon, 04 Apr 2022 10:58:20 -0000
-
-halide (13.0.4-2) unstable; urgency=medium
-
-  * Rebuild against python3.10
-
- -- Roman Lebedev <lebedev.ri@gmail.com>  Tue, 29 Mar 2022 14:21:45 +0300
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Fri, 08 Apr 2022 12:51:46 +0300
 
 halide (13.0.4-1) unstable; urgency=medium
 

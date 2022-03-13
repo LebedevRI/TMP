@@ -5,11 +5,11 @@ include /usr/share/dpkg/architecture.mk
 # We do not care about distro's LTO preferences.
 DEB_BUILD_MAINT_OPTIONS += optimize=-lto
 
-HALIDE_VERSION = 13
+HALIDE_VERSION = 14
 
 HALIDE_SOVERSION = 0
 
-LLVM_VERSION = 13
+LLVM_VERSION = 14
 
 WITH_LTO = OFF
 WITH_TESTS = ON
@@ -62,7 +62,12 @@ SOURCE_DIR = $(CURDIR)
 BUILD_STAGE ?= 1
 STAGE_COMPILE_FLAGS ?=
 
-CFLAGS = -g $(STAGE_COMPILE_FLAGS)
+CFLAGS = -g
+
+# DWZ supports, at most, DWARF4, while the default is DWARF5.
+CFLAGS += -fdebug-default-version=4
+
+CFLAGS += $(STAGE_COMPILE_FLAGS)
 
 ifneq ($(WITH_LLD),OFF)
 	CFLAGS += -fuse-ld=lld-$(LLVM_VERSION)

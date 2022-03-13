@@ -8,10 +8,10 @@ Forwarded: not-needed
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 5f56d11..0df0294 100644
+index 809b3ef..ab2d2da 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -387,8 +387,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
+@@ -391,8 +391,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
  
  set_target_properties(Halide PROPERTIES
                        POSITION_INDEPENDENT_CODE ON
