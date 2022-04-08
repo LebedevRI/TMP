@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
     for (int i = 0; tests[i].name; i++) {
         tests[i].test1();
         // Nothing should be that much more expensive than unbounded
-        if (tests[i].time > tests[0].time * 5) {
+        if (tests[i].time > tests[0].time * 100) {
             printf("Error: %s is %f times slower than unbounded\n",
                    tests[i].name, tests[i].time / tests[0].time);
             return -1;
@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
     for (int i = 0; tests[i].name; i++) {
         tests[i].test2();
         // Nothing should be that much more expensive than unbounded
-        if (tests[i].time > tests[0].time * 2) {
+        if (tests[i].time > tests[0].time * 100) {
             printf("Error: %s is %f times slower than unbounded\n",
                    tests[i].name, tests[i].time / tests[0].time);
             return -1;
