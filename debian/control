@@ -100,8 +100,6 @@ Multi-Arch: foreign
 Section: doc
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Enhances: libhalide14-0-dev
-Breaks: libhalide13-doc (<< 13.0.3)
-Replaces: libhalide13-doc (<< 13.0.3)
 Description: fast, portable computation on images and tensors (Doxygen documentation)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
