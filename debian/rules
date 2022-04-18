@@ -59,7 +59,7 @@ CXX = clang++-$(LLVM_VERSION)
 
 SOURCE_DIR = $(CURDIR)
 
-BUILD_STAGE ?= 1
+BUILD_STAGE ?= 2
 STAGE_COMPILE_FLAGS ?=
 
 CFLAGS = -g
@@ -167,18 +167,17 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 ifneq ($(WITH_PGO),OFF)
-	BUILD_STAGE=0 STAGE_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=2.0" $(MAKE) -f debian/rules perform_stage_build
+	BUILD_STAGE=0 STAGE_COMPILE_FLAGS="-fprofile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=10.0" $(MAKE) -f debian/rules perform_stage_build
 	rm -rf $(BUILD_DIR_PREFIX)
 	llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
 	rm -rf $(PROFILE_TMP_DIR)
 
-	# FIXME: why doesn't this work?
-	# BUILD_STAGE=<placeholder> STAGE_COMPILE_FLAGS="-fprofile-use=$(PROFILE) -fcs-profile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=15.0" $(MAKE) -f debian/rules perform_stage_build
-	# rm -rf $(BUILD_DIR_PREFIX)
-	# rm $(PROFILE)
-	# llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR)
-	# FIXME: should we merge the non-CS profile with CS profile? how?
-	# rm -rf $(PROFILE_TMP_DIR)
+	BUILD_STAGE=1 STAGE_COMPILE_FLAGS="-fprofile-use=$(PROFILE) -fcs-profile-generate -Xclang -mllvm -Xclang -vp-counters-per-site=100.0" $(MAKE) -f debian/rules perform_stage_build
+	rm -rf $(BUILD_DIR_PREFIX)
+	mv $(PROFILE) $(PROFILE).old
+	llvm-profdata-$(LLVM_VERSION) merge -output=$(PROFILE) $(PROFILE_TMP_DIR) $(PROFILE).old
+	rm -rf $(PROFILE_TMP_DIR)
+	rm -rf $(PROFILE).old
 
 	STAGE_COMPILE_FLAGS="-fprofile-use=$(PROFILE)" $(MAKE) -f debian/rules perform_stage_build
 else
