@@ -70,7 +70,7 @@ CFLAGS += -fdebug-default-version=4
 CFLAGS += $(STAGE_COMPILE_FLAGS)
 
 ifneq ($(WITH_LLD),OFF)
-	CFLAGS += -fuse-ld=lld-$(LLVM_VERSION)
+	CFLAGS += -fuse-ld=lld-$(LLVM_VERSION) -Wl,--build-id=sha1
 endif
 
 CXXFLAGS = $(CFLAGS)
