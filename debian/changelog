@@ -1,3 +1,11 @@
+halide (14.0.0-2) unstable; urgency=medium
+
+  * Enable second PGO round (call-site-aware)
+  * Use -Wl,--build-id=sha1 to make sure debugedit can do its job.
+    Cherry-picked from Gianfranco Costamagna's change for Ubuntu.
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Wed, 20 Apr 2022 15:00:55 +0300
+
 halide (14.0.0-1) unstable; urgency=medium
 
   * New upstream major release.
