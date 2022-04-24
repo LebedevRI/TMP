@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:unstable-slim
     env:
-      BUILDER: pbuilder
+      BUILDER: cowbuilder
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Configure APT
@@ -33,9 +33,9 @@ jobs:
           rm -rf /var/lib/apt/lists/*
           apt-get update
           apt-get upgrade
-          apt-get install git \
+          apt-get install cowbuilder \
+                          git \
                           git-buildpackage \
-                          pbuilder \
                           sudo
           apt-get clean
       - name: Create baseline build environment
