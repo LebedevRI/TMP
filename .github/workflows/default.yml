@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILDER: pbuilder
+      DIST: sid
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Install necessary packages
@@ -24,7 +25,7 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
-          sudo git-pbuilder create
+          git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
