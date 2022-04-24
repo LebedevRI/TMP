@@ -8,6 +8,8 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     container: debian:unstable-slim
+    env:
+      DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Configure APT
         env:
