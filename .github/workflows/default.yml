@@ -35,6 +35,10 @@ jobs:
           apt-get install git \
                           git-buildpackage
           apt-get clean
+      - name: Create baseline build environment
+        run: |
+          set -xe
+          git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
@@ -70,4 +74,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          exit 1
+          gbp buildpackage --git-ignore-new --git-ignore-branch
