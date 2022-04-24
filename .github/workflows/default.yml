@@ -43,10 +43,10 @@ jobs:
       - name: Fetch upstream halide git repository
         run: |
           git fetch upstream
-      - name: Refresh our copy of `main` branch
+      - name: "Refresh" our copy of `main` branch
         run: |
-          git rebase upstream/main main;
-          git push;
+          git checkout -B main upstream/main;
+          git push -f origin;
       - name: Prepare the package
         run: |
           git rebase main patch-queue/debian-nightly;
