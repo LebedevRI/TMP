@@ -34,7 +34,8 @@ jobs:
           apt-get update
           apt-get upgrade
           apt-get install git \
-                          git-buildpackage
+                          git-buildpackage \
+                          pbuilder
           apt-get clean
       - name: Create baseline build environment
         run: |
