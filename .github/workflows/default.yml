@@ -1,0 +1,61 @@
+name: Build Halide nightly amd64 deb package for debian sid
+
+on:
+  push:
+    branches: [ buildbot ]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    container: debian:unstable-slim
+    steps:
+      - name: Configure APT
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          # Paper over occasional network flakiness of some mirrors.
+          echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retry
+          # Do not install recommended packages
+          echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/80recommends
+          # Do not install suggested packages
+          echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/80suggests
+          # Assume yes
+          echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/80forceyes
+          # Fix broken packages
+          echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
+      - name: Install/Update necessary packages
+        run: |
+          rm -rf /var/lib/apt/lists/*;
+          apt-get update;
+          apt-get upgrade;
+          apt-get install git \
+                          git-buildpackage;
+          apt-get clean;
+      - uses: actions/checkout@v3
+        name: Fetch our git repository
+        with:
+          path: ''
+          fetch-depth: 0
+      - name: Start tracking upstream halide git repository
+        run: |
+          git remote add upstream https://github.com/halide/Halide.git
+      - name: Fetch upstream halide git repository
+        run: |
+          git fetch upstream
+      - name: Refresh our copy of `main` branch
+        run: |
+          git rebase upstream/main main;
+          git push;
+      - name: Prepare the package
+        run: |
+          git rebase main patch-queue/debian-nightly;
+          git checkout -b patch-queue/main;
+          git checkout main;
+          test -e debian && echo "debian/ already exists." && exit 1;
+          git checkout debian-nightly -- debian/
+          test -e debian/patches && echo "debian/patches already exists." && exit 1;
+          gbp pq export;
+          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0;
+      - name: BUILD
+        run: |
+          exi1 1
