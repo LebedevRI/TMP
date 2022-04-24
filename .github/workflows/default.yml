@@ -15,6 +15,7 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
+          set -xe
           # Paper over occasional network flakiness of some mirrors.
           echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retry
           # Do not install recommended packages
@@ -27,6 +28,7 @@ jobs:
           echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
       - name: Install/Update necessary packages
         run: |
+          set -xe
           rm -rf /var/lib/apt/lists/*
           apt-get update
           apt-get upgrade
@@ -40,17 +42,21 @@ jobs:
           fetch-depth: 0
       - name: Start tracking upstream halide git repository
         run: |
+          set -xe
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git remote add upstream https://github.com/halide/Halide.git
       - name: Fetch upstream halide git repository
         run: |
+          set -xe
           git fetch upstream
       - name: Refresh our copy of `main` branch
         run: |
+          set -xe
           git checkout -B main upstream/main
           git push -f origin
       - name: Prepare the package
         run: |
+          set -xe
           git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
           git rebase main patch-queue/debian-nightly
           git push -f origin
@@ -63,4 +69,5 @@ jobs:
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0
       - name: BUILD
         run: |
+          set -xe
           exit 1
