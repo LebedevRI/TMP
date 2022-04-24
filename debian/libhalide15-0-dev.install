@@ -1,0 +1,6 @@
+usr/include/halide15/
+usr/lib/*/cmake/Halide15/
+usr/lib/*/cmake/HalideHelpers15/
+usr/lib/*/libHalide15.so
+usr/lib/*/halide15/
+usr/src/halide15/
