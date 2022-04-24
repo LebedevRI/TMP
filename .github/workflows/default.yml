@@ -42,7 +42,7 @@ jobs:
           git remote add upstream https://github.com/halide/Halide.git
       - name: Fetch upstream halide git repository
         run: |
-          git fetch upstream
+          git fetch upstream;
       - name: "Refresh" our copy of `main` branch
         run: |
           git checkout -B main upstream/main;
