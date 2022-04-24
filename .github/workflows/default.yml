@@ -10,6 +10,7 @@ jobs:
     env:
       BUILDER: pbuilder
       DIST: sid
+      GIT_PBUILDER_OPTIONS: --mirror https://deb.debian.org/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Install necessary packages
