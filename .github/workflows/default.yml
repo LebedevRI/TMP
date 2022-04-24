@@ -19,7 +19,8 @@ jobs:
           set -xe
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt-get install debian-archive-keyring \
+          sudo apt-get install debhelper \
+                               debian-archive-keyring \
                                git \
                                git-buildpackage \
                                pbuilder \
