@@ -7,9 +7,8 @@ on:
 jobs:
   linux:
     runs-on: ubuntu-latest
-    container: debian:unstable-slim
     env:
-      BUILDER: cowbuilder
+      BUILDER: pbuilder
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Configure APT
@@ -27,15 +26,14 @@ jobs:
           echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/80forceyes
           # Fix broken packages
           echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
-      - name: Install/Update necessary packages
+      - name: Install necessary packages
         run: |
           set -xe
           rm -rf /var/lib/apt/lists/*
           apt-get update
-          apt-get upgrade
-          apt-get install cowbuilder \
-                          git \
+          apt-get install git \
                           git-buildpackage \
+                          pbuilder \
                           sudo
           apt-get clean
       - name: Create baseline build environment
