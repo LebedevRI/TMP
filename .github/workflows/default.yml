@@ -59,7 +59,7 @@ jobs:
           git checkout origin/debian-nightly -- debian/
           test -e debian/patches && echo "debian/patches already exists." && exit 1
           gbp pq export
-          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0
+          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=1
       - name: BUILD
         run: |
           set -xe
