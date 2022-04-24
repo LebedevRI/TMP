@@ -49,14 +49,16 @@ jobs:
           git push -f origin;
       - name: Prepare the package
         run: |
+          git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly;
           git rebase main patch-queue/debian-nightly;
+          git push -f origin;
           git checkout -b patch-queue/main;
           git checkout main;
           test -e debian && echo "debian/ already exists." && exit 1;
-          git checkout debian-nightly -- debian/
+          git checkout origin/debian-nightly -- debian/
           test -e debian/patches && echo "debian/patches already exists." && exit 1;
           gbp pq export;
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0;
       - name: BUILD
         run: |
-          exi1 1
+          exit 1
