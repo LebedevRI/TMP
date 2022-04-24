@@ -11,21 +11,6 @@ jobs:
       BUILDER: pbuilder
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
-      - name: Configure APT
-        env:
-          DEBIAN_FRONTEND: noninteractive
-        run: |
-          set -xe
-          # Paper over occasional network flakiness of some mirrors.
-          sudo echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retry
-          # Do not install recommended packages
-          sudo echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/80recommends
-          # Do not install suggested packages
-          sudo echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/80suggests
-          # Assume yes
-          sudo echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/80forceyes
-          # Fix broken packages
-          sudo echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
       - name: Install necessary packages
         run: |
           set -xe
