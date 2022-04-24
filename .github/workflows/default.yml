@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:unstable-slim
     env:
+      BUILDER: pbuilder
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Configure APT
