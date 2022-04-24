@@ -11,6 +11,7 @@ jobs:
       BUILDER: pbuilder
       DIST: sid
       GIT_PBUILDER_OPTIONS: --mirror https://deb.debian.org/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
+      DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
       - name: Install necessary packages
@@ -63,4 +64,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-ignore-new --git-ignore-branch
+          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-builder=/usr/bin/pdebuild --git-ignore-new --git-ignore-branch
