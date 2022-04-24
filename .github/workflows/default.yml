@@ -38,6 +38,7 @@ jobs:
           fetch-depth: 0
       - name: Start tracking upstream halide git repository
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git remote add upstream https://github.com/halide/Halide.git
       - name: Fetch upstream halide git repository
         run: |
