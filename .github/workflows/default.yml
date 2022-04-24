@@ -17,29 +17,29 @@ jobs:
         run: |
           set -xe
           # Paper over occasional network flakiness of some mirrors.
-          echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retry
+          sudo echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retry
           # Do not install recommended packages
-          echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/80recommends
+          sudo echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/80recommends
           # Do not install suggested packages
-          echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/80suggests
+          sudo echo 'APT::Install-Suggests "false";' > /etc/apt/apt.conf.d/80suggests
           # Assume yes
-          echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/80forceyes
+          sudo echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/80forceyes
           # Fix broken packages
-          echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
+          sudo echo 'APT::Get::Fix-Missing "true";' > /etc/apt/apt.conf.d/80fixmissing
       - name: Install necessary packages
         run: |
           set -xe
-          rm -rf /var/lib/apt/lists/*
-          apt-get update
-          apt-get install git \
-                          git-buildpackage \
-                          pbuilder \
-                          sudo
-          apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get update
+          sudo apt-get install git \
+                               git-buildpackage \
+                               pbuilder \
+                               sudo
+          sudo apt-get clean
       - name: Create baseline build environment
         run: |
           set -xe
-          git-pbuilder create
+          sudo git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
