@@ -64,4 +64,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-builder=/usr/bin/pdebuild --git-ignore-new --git-ignore-branch
+          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-ignore-new --git-ignore-branch
