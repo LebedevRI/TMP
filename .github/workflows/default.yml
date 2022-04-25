@@ -28,7 +28,7 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
-          # git-pbuilder create
+          git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
@@ -58,11 +58,8 @@ jobs:
           git checkout -B WIP
           git config --global user.email "$DEBEMAIL"
           git config --global user.name "$DEBFULLNAME"
-          git status
           git add debian/
-          git status
           git commit -m "new snapshot"
-          git status
       - name: BUILD
         run: |
           set -xe
