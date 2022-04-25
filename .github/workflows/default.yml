@@ -11,7 +11,6 @@ jobs:
       BUILDER: pbuilder
       GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal
-      GIT_PBUILDER_DEBUG: true
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
@@ -55,16 +54,15 @@ jobs:
           git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
           git rebase main patch-queue/debian-nightly
           git push -f origin
-          git checkout -B patch-queue/main
           git checkout main
           test -e debian && echo "debian/ already exists." && exit 1
           git checkout origin/debian-nightly -- debian/
-          test -e debian/patches && echo "debian/patches already exists." && exit 1
-          gbp pq export
+          test -e debian/patches && echo "debian/patches exists." && exit 1
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
           git checkout -B WIP
           git add debian/
-          git commit -m "new snapshot"
+          git commit -m "merge debian packaging"
+          git merge -m "merge debian patches" patch-queue/debian-nightly
       - name: BUILD
         run: |
           set -xe
