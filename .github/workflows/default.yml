@@ -24,7 +24,9 @@ jobs:
       - name: Install necessary packages
         run: |
           set -xe
+          sudo mkdir -p /etc/dpkg/dpkg.cfg.d/
           sudo echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+          sudo mkdir -p /etc/apt/apt.conf.d/
           sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
           Dir::Cache::Archives "/tmp/apt/archives";
           APT::ExtractTemplates::TempDir "/tmp/apt/temp";
