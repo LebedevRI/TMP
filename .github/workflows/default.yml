@@ -14,7 +14,7 @@ jobs:
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
-      DEB_BUILD_OPTIONS: nopgo nocheck
+      DEB_BUILD_OPTIONS: nolto nocheck nopgo
     steps:
       - name: Configure git
         run: |
@@ -24,9 +24,16 @@ jobs:
       - name: Install necessary packages
         run: |
           set -xe
+          sudo echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+          sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
+          Dir::Cache::Archives "/tmp/apt/archives";
+          APT::ExtractTemplates::TempDir "/tmp/apt/temp";
+          EOT
+          mkdir -p /tmp/apt/archives /tmp/apt/temp
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
           sudo apt-get install debian-archive-keyring \
+                               eatmydata \
                                git \
                                git-buildpackage \
                                pbuilder \
@@ -35,15 +42,25 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
+          sudo tee /etc/pbuilderrc > /dev/null <<EOT
+          APTCACHE=/tmp/pbuilder/aptcache/
+          BASETGZ=/tmp/pbuilder/base.tgz
+          BUILDPLACE=/tmp/pbuilder/build/
+          BUILDRESULT=/tmp/pbuilder/result/
+          EATMYDATA=YES
+          COMPRESSPROG=cat
+          EXTRAPACKAGES="eatmydata"
+          EOT
           git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
-          path: ''
+          path: 'halide-src'
           fetch-depth: 0
       - name: Refresh our copy of `main` branch from upstream halide git repository
         run: |
           set -xe
+          cd "$GITHUB_WORKSPACE/halide-src/"
           git remote add upstream https://github.com/halide/Halide.git
           git fetch upstream main:refs/remotes/upstream/main
           git checkout -B main upstream/main
@@ -51,6 +68,7 @@ jobs:
       - name: Prepare the package
         run: |
           set -xe
+          cd "$GITHUB_WORKSPACE/halide-src/"
           git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
           git rebase main patch-queue/debian-nightly
           git push -f origin
@@ -66,4 +84,12 @@ jobs:
       - name: BUILD
         run: |
           set -xe
+          cd "$GITHUB_WORKSPACE/halide-src/"
           gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+      - name: SUCCESS?
+        run: |
+          set -xe
+          cd "$GITHUB_WORKSPACE/halide-src/"
+          ls -lah .
+          ls -lah ..
+          ls -lah /tmp/pbuilder/result/
