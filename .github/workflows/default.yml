@@ -67,7 +67,7 @@ jobs:
           EATMYDATA=YES
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
-          DEBOOTSTRAPOPTS="--variant=minbase"
+          DEBOOTSTRAPOPTS='--variant=minbase'
           EOT
           mkdir -p /tmp/pbuilder/aptcache
           git-pbuilder create
