@@ -1,4 +1,4 @@
-name: Build Halide nightly amd64 deb package for debian sid
+name: Build Halide nightly amd64 deb package for debian unstable
 
 on:
   push:
@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILDER: pbuilder
-      DIST: sid
-      GIT_PBUILDER_OPTIONS: --mirror https://deb.debian.org/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
+      DIST: unstable
+      GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
@@ -63,4 +63,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-builder=/usr/bin/pdebuild --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
