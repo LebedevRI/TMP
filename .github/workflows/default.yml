@@ -64,7 +64,7 @@ jobs:
           git checkout -B WIP
           git config --global user.email "$DEBEMAIL"
           git config --global user.name "$DEBFULLNAME"
-          git commit -m "new snapshot" debian/*
+          git commit -m "new snapshot" debian/\*
       - name: BUILD
         run: |
           set -xe
