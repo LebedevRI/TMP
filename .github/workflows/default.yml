@@ -63,4 +63,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-builder=/usr/bin/pdebuild --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
