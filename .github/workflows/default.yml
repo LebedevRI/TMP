@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILDER: pbuilder
+      GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
@@ -27,7 +28,7 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
-          sudo pbuilder create --distribution $DIST --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
+          git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
@@ -62,4 +63,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-builder=/usr/bin/pdebuild --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+          BUILDER=$BUILDER DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
