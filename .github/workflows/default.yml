@@ -24,14 +24,29 @@ jobs:
       - name: Install necessary packages
         run: |
           set -xe
-          sudo mkdir -p /etc/dpkg/dpkg.cfg.d/
-          sudo echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
-          sudo mkdir -p /etc/apt/apt.conf.d/
+          sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io > /dev/null <<EOT
+          force-unsafe-io
+          EOT
           sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
           Dir::Cache::Archives "/tmp/apt/archives";
           APT::ExtractTemplates::TempDir "/tmp/apt/temp";
           EOT
           mkdir -p /tmp/apt/archives /tmp/apt/temp
+          sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
+          Acquire::Retries "10";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80recommends > /dev/null <<EOT
+          APT::Install-Recommends "false";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80suggests > /dev/null <<EOT
+          APT::Install-Suggests "false";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80forceyes > /dev/null <<EOT
+          APT::Get::Assume-Yes "true";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80fixmissing > /dev/null <<EOT
+          APT::Get::Fix-Missing "true";
+          EOT
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
           sudo apt-get install debian-archive-keyring \
