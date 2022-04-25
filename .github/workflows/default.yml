@@ -28,7 +28,7 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
-          git-pbuilder create
+          # git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
@@ -51,14 +51,21 @@ jobs:
           git checkout -B patch-queue/main
           git checkout main
           test -e debian && echo "debian/ already exists." && exit 1
+          git status
           git checkout origin/debian-nightly -- debian/
+          git status
           test -e debian/patches && echo "debian/patches already exists." && exit 1
+          git status
           gbp pq export
+          git status
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
+          git status
           git checkout -B WIP
           git config --global user.email "$DEBEMAIL"
           git config --global user.name "$DEBFULLNAME"
+          git status
           git commit -m "new snapshot" debian/ debian/patches/
+          git status
       - name: BUILD
         run: |
           set -xe
