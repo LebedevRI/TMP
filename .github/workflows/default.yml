@@ -19,8 +19,7 @@ jobs:
           set -xe
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt-get install debhelper \
-                               debian-archive-keyring \
+          sudo apt-get install debian-archive-keyring \
                                git \
                                git-buildpackage \
                                pbuilder \
@@ -62,7 +61,9 @@ jobs:
           test -e debian/patches && echo "debian/patches already exists." && exit 1
           gbp pq export
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0
+          git checkout -b WIP
+          git commit -m "new snapshot" debian/
       - name: BUILD
         run: |
           set -xe
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-ignore-new --git-ignore-branch
+          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP
