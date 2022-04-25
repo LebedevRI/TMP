@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILDER: pbuilder
-      GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
+      GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--variant=minbase" --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
@@ -67,7 +67,6 @@ jobs:
           EATMYDATA=YES
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
-          DEBOOTSTRAPOPTS='--variant=minbase'
           EOT
           mkdir -p /tmp/pbuilder/aptcache
           git-pbuilder create
