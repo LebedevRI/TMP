@@ -31,7 +31,7 @@ jobs:
           Dir::Cache::Archives "/tmp/apt/archives";
           APT::ExtractTemplates::TempDir "/tmp/apt/temp";
           EOT
-          mkdir -p /tmp/apt/archives /tmp/apt/temp
+          mkdir -p /tmp/apt/archives
           sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
           Acquire::Retries "10";
           EOT
@@ -68,6 +68,7 @@ jobs:
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
           EOT
+          mkdir /tmp/pbuilder/aptcache
           git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
