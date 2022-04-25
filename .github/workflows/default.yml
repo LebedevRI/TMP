@@ -27,7 +27,7 @@ jobs:
       - name: Create baseline build environment
         run: |
           set -xe
-          pbuilder create --distribution $DIST --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
+          sudo pbuilder create --distribution $DIST --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       - uses: actions/checkout@v3
         name: Fetch our git repository
         with:
