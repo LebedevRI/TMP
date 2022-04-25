@@ -54,14 +54,16 @@ jobs:
           git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
           git rebase main patch-queue/debian-nightly
           git push -f origin
-          git checkout -b patch-queue/main
+          git checkout -B patch-queue/main
           git checkout main
           test -e debian && echo "debian/ already exists." && exit 1
           git checkout origin/debian-nightly -- debian/
           test -e debian/patches && echo "debian/patches already exists." && exit 1
           gbp pq export
-          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=0
-          git checkout -b WIP
+          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
+          git checkout -B WIP
+          git config --global user.email "$DEBEMAIL"
+          git config --global user.name "$DEBFULLNAME"
           git commit -m "new snapshot" debian/
       - name: BUILD
         run: |
