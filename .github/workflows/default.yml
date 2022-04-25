@@ -15,6 +15,11 @@ jobs:
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
     steps:
+      - name: Configure git
+        run: |
+          git config --global user.email "$DEBEMAIL"
+          git config --global user.name "$DEBFULLNAME"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install necessary packages
         run: |
           set -xe
@@ -38,7 +43,6 @@ jobs:
       - name: Refresh our copy of `main` branch from upstream halide git repository
         run: |
           set -xe
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git remote add upstream https://github.com/halide/Halide.git
           git fetch upstream main:refs/remotes/upstream/main
           git checkout -B main upstream/main
@@ -57,8 +61,6 @@ jobs:
           gbp pq export
           gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
           git checkout -B WIP
-          git config --global user.email "$DEBEMAIL"
-          git config --global user.name "$DEBFULLNAME"
           git add debian/
           git commit -m "new snapshot"
       - name: BUILD
