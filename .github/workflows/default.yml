@@ -15,6 +15,7 @@ jobs:
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
+      DEB_BUILD_OPTIONS: nopgo nocheck
     steps:
       - name: Configure git
         run: |
@@ -67,5 +68,4 @@ jobs:
       - name: BUILD
         run: |
           set -xe
-          export BUILDER=$BUILDER
-          DEB_BUILD_OPTIONS=nopgo,nocheck gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
