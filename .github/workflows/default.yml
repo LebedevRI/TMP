@@ -68,7 +68,7 @@ jobs:
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
           EOT
-          mkdir /tmp/pbuilder/aptcache
+          mkdir -p /tmp/pbuilder/aptcache
           git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
