@@ -34,18 +34,12 @@ jobs:
         with:
           path: ''
           fetch-depth: 0
-      - name: Start tracking upstream halide git repository
+      - name: Refresh our copy of `main` branch from upstream halide git repository
         run: |
           set -xe
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git remote add upstream https://github.com/halide/Halide.git
-      - name: Fetch upstream halide git repository
-        run: |
-          set -xe
-          git fetch upstream
-      - name: Refresh our copy of `main` branch
-        run: |
-          set -xe
+          git fetch upstream main:refs/remotes/upstream/main
           git checkout -B main upstream/main
           git push -f origin
       - name: Prepare the package
