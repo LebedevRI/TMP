@@ -119,7 +119,7 @@ jobs:
       - name: SUCCESS?
         run: |
           set -xe
-          mkdir "/tmp/pbuilder/result"
+          mkdir -p "/tmp/pbuilder/result"
           cd "/tmp/pbuilder/result"
           echo HI > TEST
           git init
