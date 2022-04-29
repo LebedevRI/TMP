@@ -80,7 +80,7 @@ jobs:
           EXTRAPACKAGES="eatmydata"
           AUTO_DEBSIGN=yes
           EOT
-          mkdir -p /tmp/pbuilder/aptcache
+          mkdir -p /tmp/pbuilder/{aptcache,build,result}
           git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
