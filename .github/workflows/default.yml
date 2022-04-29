@@ -128,7 +128,7 @@ jobs:
           set -xe
           cd "$GITHUB_WORKSPACE/halide-src/"
           gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
-      - name: SUCCESS?
+      - name: Store built package
         run: |
           set -xe
           cd "/tmp/pbuilder/result"
@@ -137,4 +137,4 @@ jobs:
           git add .
           git commit -m "new halide snapshot for debian $DIST"
           git remote add origin git@github.com:LebedevRI/TMP-publish.git
-          git push --set-upstream origin packages/$DIST/halide
+          git push -f --set-upstream origin packages/$DIST/halide
