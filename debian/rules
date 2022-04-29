@@ -192,3 +192,6 @@ override_dh_auto_install:
 
 override_dh_install:
 	dh_install --sourcedir=$(INSTALL_DIR)
+
+override_dh_builddeb:
+	dh_builddeb -- -Zxz -Sextreme -z9
