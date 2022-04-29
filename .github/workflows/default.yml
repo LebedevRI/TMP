@@ -60,6 +60,7 @@ jobs:
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
           sudo apt-get install debian-archive-keyring \
+                               devscripts \
                                eatmydata \
                                git \
                                git-buildpackage \
@@ -77,6 +78,7 @@ jobs:
           EATMYDATA=YES
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
+          AUTO_DEBSIGN=yes
           EOT
           mkdir -p /tmp/pbuilder/aptcache
           git-pbuilder create
@@ -118,6 +120,7 @@ jobs:
         run: |
           set -xe
           cd "$GITHUB_WORKSPACE/halide-src/"
-          ls -lah .
-          ls -lah ..
-          ls -lah /tmp/pbuilder/result/
+          ls -lah . || /bin/true
+          ls -lah .. || /bin/true
+          ls -lah /tmp/pbuilder/result || /bin/true
+          ls -lah /var/cache/pbuilder/result || /bin/true
