@@ -122,9 +122,10 @@ jobs:
           mkdir -p "/tmp/pbuilder/result"
           cd "/tmp/pbuilder/result"
           echo HI > TEST
+          date -u +%Y%m%d%H%M%S > TEST
           git init
           git checkout -B packages/$DIST/halide
           git add .
           git commit -m "new halide snapshot for debian $DIST"
           git remote add origin git@github.com:LebedevRI/TMP-publish.git
-          git push -f origin
+          git push --force --set-upstream origin
