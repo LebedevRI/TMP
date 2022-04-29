@@ -54,12 +54,12 @@ jobs:
                                pbuilder \
                                sudo
           sudo apt-get clean
-      - name: Configure git
+      - name: Configure git/GPG/ssh
         run: |
           set -xe
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           mkdir -p ~/.gnupg
-          echo "F948A40717A2BB9D0B39D15881BAA414C59F65D0" >> ~/.gnupg/sshcontrol
+          echo "9BD2035A6077B7F6A82A54631BBA3AB03A8A8E3C" >> ~/.gnupg/sshcontrol
           echo "" >> ~/.gnupg/gpg-agent.conf
           echo "enable-ssh-support" >> ~/.gnupg/gpg-agent.conf
           gpgconf --kill gpg-agent
