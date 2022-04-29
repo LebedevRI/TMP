@@ -16,10 +16,23 @@ jobs:
       DEBEMAIL: lebedev.ri@gmail.com
       DEB_BUILD_OPTIONS: nolto nocheck nopgo
     steps:
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v4
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - name: List keys
+        run: gpg -K
       - name: Configure git
         run: |
           git config --global user.email "$DEBEMAIL"
           git config --global user.name "$DEBFULLNAME"
+          git config --global user.signingkey "F948A40717A2BB9D0B39D15881BAA414C59F65D0"
+          git config --global commit.gpgSign "true"
+          git config --global push.gpgSign "true"
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Install necessary packages
         run: |
