@@ -73,10 +73,11 @@ jobs:
           echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "F948A40717A2BB9D0B39D15881BAA414C59F65D0" >> ~/.gnupg/sshcontrol
           echo "\nenable-ssh-support" >> ~/.gnupg/gpg-agent.conf
-          export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-          echo "IdentityAgent $SSH_AUTH_SOCK" >> ~/.ssh/config
           gpgconf --kill gpg-agent
           gpgconf --launch gpg-agent
+          export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+          mkdir -p ~/.ssh
+          echo "IdentityAgent $SSH_AUTH_SOCK" >> ~/.ssh/config
       #- name: Create baseline build environment
         #run: |
           #set -xe
