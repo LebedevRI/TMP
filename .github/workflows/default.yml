@@ -28,49 +28,53 @@ jobs:
           git_commit_gpgsign: true
           git_tag_gpgsign: true
           git_push_gpgsign: "if-asked"
+      - name: Install necessary packages
+        run: |
+          set -xe
+          sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io > /dev/null <<EOT
+          force-unsafe-io
+          EOT
+          sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
+          Dir::Cache::Archives "/tmp/apt/archives";
+          APT::ExtractTemplates::TempDir "/tmp/apt/temp";
+          EOT
+          mkdir -p /tmp/apt/archives
+          sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
+          Acquire::Retries "10";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80recommends > /dev/null <<EOT
+          APT::Install-Recommends "false";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80suggests > /dev/null <<EOT
+          APT::Install-Suggests "false";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80forceyes > /dev/null <<EOT
+          APT::Get::Assume-Yes "true";
+          EOT
+          sudo tee /etc/apt/apt.conf.d/80fixmissing > /dev/null <<EOT
+          APT::Get::Fix-Missing "true";
+          EOT
+          sudo rm -rf /var/lib/apt/lists/*
+          sudo apt-get update
+          sudo apt-get install debian-archive-keyring \
+                               devscripts \
+                               eatmydata \
+                               git \
+                               git-buildpackage \
+                               gpg-agent \
+                               gpgconf \
+                               pbuilder \
+                               sudo
+          sudo apt-get clean
       - name: Configure git
         run: |
+          set -xe
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo enable-ssh-support >> $HOME/.gnupg/gpg-agent.conf
           echo F948A40717A2BB9D0B39D15881BAA414C59F65D0 >> ~/.gnupg/sshcontrol
           export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+          gpg-agent --gpgconf-test
           gpgconf --launch gpg-agent
-      #- name: Install necessary packages
-        #run: |
-          #set -xe
-          #sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io > /dev/null <<EOT
-          #force-unsafe-io
-          #EOT
-          #sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
-          #Dir::Cache::Archives "/tmp/apt/archives";
-          #APT::ExtractTemplates::TempDir "/tmp/apt/temp";
-          #EOT
-          #mkdir -p /tmp/apt/archives
-          #sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
-          #Acquire::Retries "10";
-          #EOT
-          #sudo tee /etc/apt/apt.conf.d/80recommends > /dev/null <<EOT
-          #APT::Install-Recommends "false";
-          #EOT
-          #sudo tee /etc/apt/apt.conf.d/80suggests > /dev/null <<EOT
-          #APT::Install-Suggests "false";
-          #EOT
-          #sudo tee /etc/apt/apt.conf.d/80forceyes > /dev/null <<EOT
-          #APT::Get::Assume-Yes "true";
-          #EOT
-          #sudo tee /etc/apt/apt.conf.d/80fixmissing > /dev/null <<EOT
-          #APT::Get::Fix-Missing "true";
-          #EOT
-          #sudo rm -rf /var/lib/apt/lists/*
-          #sudo apt-get update
-          #sudo apt-get install debian-archive-keyring \
-                               #devscripts \
-                               #eatmydata \
-                               #git \
-                               #git-buildpackage \
-                               #pbuilder \
-                               #sudo
-          #sudo apt-get clean
       #- name: Create baseline build environment
         #run: |
           #set -xe
