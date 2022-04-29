@@ -8,7 +8,6 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     env:
-      GITHUB_WORKSPACE: /tmp/$(uuidgen)
       BUILDER: pbuilder
       GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--variant=minbase" --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
       GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal
@@ -69,7 +68,7 @@ jobs:
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
           EOT
-          mkdir -p /tmp/pbuilder/aptcache /tmp/pbuilder/result
+          mkdir -p /tmp/pbuilder/aptcache
           git-pbuilder create
       - uses: actions/checkout@v3
         name: Fetch our git repository
