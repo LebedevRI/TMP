@@ -124,8 +124,8 @@ jobs:
           echo HI > TEST
           date -u +%Y%m%d%H%M%S > TEST
           git init
-          git remote add origin git@github.com:LebedevRI/TMP-publish.git
-          git checkout -B packages/$DIST/halide origin/packages/$DIST/halide
+          git switch --orphan packages/$DIST/halide
           git add .
           git commit -m "new halide snapshot for debian $DIST"
-          git push -f
+          git remote add origin git@github.com:LebedevRI/TMP-publish.git
+          git push --set-upstream origin packages/$DIST/halide
