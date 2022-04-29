@@ -127,14 +127,15 @@ jobs:
         run: |
           set -xe
           cd "$GITHUB_WORKSPACE/halide-src/"
-          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-compression=xz --git-compression-level=9 --git-verbose
       - name: Store built package
         run: |
           set -xe
           cd "/tmp/pbuilder/result"
+          ls -lah
           git init
           git switch --orphan packages/$DIST/halide
           git add .
-          git commit -m "new halide snapshot for debian $DIST"
+          git commit -m "halide snapshot for debian $DIST"
           git remote add origin git@github.com:LebedevRI/TMP-publish.git
           git push -f --set-upstream origin packages/$DIST/halide
