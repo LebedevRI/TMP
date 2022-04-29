@@ -72,13 +72,14 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo "use-agent" >> ~/.gnupg/gpg.conf
           gpg-agent --gpgconf-test
+          echo "F948A40717A2BB9D0B39D15881BAA414C59F65D0" >> ~/.gnupg/sshcontrol
           echo "enable-ssh-support" >> ~/.gnupg/gpg-agent.conf
-          gpg-agent --gpgconf-test
           cat ~/.gnupg/gpg-agent.conf
-          echo F948A40717A2BB9D0B39D15881BAA414C59F65D0 >> ~/.gnupg/sshcontrol
+          gpg-agent --gpgconf-test
           export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
           echo "IdentityAgent $SSH_AUTH_SOCK" >> ~/.ssh/config
           gpgconf --kill gpg-agent
+          gpgconf --launch gpg-agent
       #- name: Create baseline build environment
         #run: |
           #set -xe
