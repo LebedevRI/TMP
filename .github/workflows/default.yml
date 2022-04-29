@@ -10,7 +10,7 @@ jobs:
     env:
       BUILDER: pbuilder
       GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--variant=minbase" --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
-      GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal
+      GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal --auto-debsign --buildresult /tmp/pbuilder/result
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
@@ -122,5 +122,6 @@ jobs:
           cd "$GITHUB_WORKSPACE/halide-src/"
           ls -lah . || /bin/true
           ls -lah .. || /bin/true
+          ls -lah ../.. || /bin/true
           ls -lah /tmp/pbuilder/result || /bin/true
           ls -lah /var/cache/pbuilder/result || /bin/true
