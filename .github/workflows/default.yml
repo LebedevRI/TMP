@@ -72,7 +72,11 @@ jobs:
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
           echo "use-agent" >> ~/.gnupg/gpg.conf
           echo "F948A40717A2BB9D0B39D15881BAA414C59F65D0" >> ~/.gnupg/sshcontrol
-          echo "\nenable-ssh-support" >> ~/.gnupg/gpg-agent.conf
+          gpg-agent --gpgconf-test
+          echo "" >> ~/.gnupg/gpg-agent.conf
+          echo "enable-ssh-support" >> ~/.gnupg/gpg-agent.conf
+          cat ~/.gnupg/gpg-agent.conf
+          gpg-agent --gpgconf-test
           gpgconf --kill gpg-agent
           gpgconf --launch gpg-agent
           export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
