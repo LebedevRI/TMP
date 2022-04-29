@@ -31,97 +31,100 @@ jobs:
       - name: Configure git
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
-      - name: Install necessary packages
-        run: |
-          set -xe
-          sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io > /dev/null <<EOT
-          force-unsafe-io
-          EOT
-          sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
-          Dir::Cache::Archives "/tmp/apt/archives";
-          APT::ExtractTemplates::TempDir "/tmp/apt/temp";
-          EOT
-          mkdir -p /tmp/apt/archives
-          sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
-          Acquire::Retries "10";
-          EOT
-          sudo tee /etc/apt/apt.conf.d/80recommends > /dev/null <<EOT
-          APT::Install-Recommends "false";
-          EOT
-          sudo tee /etc/apt/apt.conf.d/80suggests > /dev/null <<EOT
-          APT::Install-Suggests "false";
-          EOT
-          sudo tee /etc/apt/apt.conf.d/80forceyes > /dev/null <<EOT
-          APT::Get::Assume-Yes "true";
-          EOT
-          sudo tee /etc/apt/apt.conf.d/80fixmissing > /dev/null <<EOT
-          APT::Get::Fix-Missing "true";
-          EOT
-          sudo rm -rf /var/lib/apt/lists/*
-          sudo apt-get update
-          sudo apt-get install debian-archive-keyring \
-                               devscripts \
-                               eatmydata \
-                               git \
-                               git-buildpackage \
-                               pbuilder \
-                               sudo
-          sudo apt-get clean
-      - name: Create baseline build environment
-        run: |
-          set -xe
-          sudo tee /etc/pbuilderrc > /dev/null <<EOT
-          APTCACHE=/tmp/pbuilder/aptcache/
-          BASETGZ=/tmp/pbuilder/base.tgz
-          BUILDPLACE=/tmp/pbuilder/build/
-          BUILDRESULT=/tmp/pbuilder/result/
-          EATMYDATA=YES
-          COMPRESSPROG=cat
-          EXTRAPACKAGES="eatmydata"
-          AUTO_DEBSIGN=yes
-          EOT
-          mkdir -p /tmp/pbuilder/{aptcache,build,result}
-          git-pbuilder create
-      - uses: actions/checkout@v3
-        name: Fetch our git repository
-        with:
-          path: 'halide-src'
-          fetch-depth: 0
-      - name: Refresh our copy of `main` branch from upstream halide git repository
-        run: |
-          set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          git remote add upstream https://github.com/halide/Halide.git
-          git fetch upstream main:refs/remotes/upstream/main
-          git checkout -B main upstream/main
-          git push -f origin
-      - name: Prepare the package
-        run: |
-          set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
-          git rebase main patch-queue/debian-nightly
-          git push -f origin
-          git checkout main
-          test -e debian && echo "debian/ already exists." && exit 1
-          git checkout origin/debian-nightly -- debian/
-          test -e debian/patches && echo "debian/patches exists." && exit 1
-          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
-          git checkout -B WIP
-          git add debian/
-          git commit -m "merge debian packaging"
-          git merge -m "merge debian patches" patch-queue/debian-nightly
-      - name: BUILD
-        run: |
-          set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
+      #- name: Install necessary packages
+        #run: |
+          #set -xe
+          #sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io > /dev/null <<EOT
+          #force-unsafe-io
+          #EOT
+          #sudo tee /etc/apt/apt.conf.d/tmpfs > /dev/null <<EOT
+          #Dir::Cache::Archives "/tmp/apt/archives";
+          #APT::ExtractTemplates::TempDir "/tmp/apt/temp";
+          #EOT
+          #mkdir -p /tmp/apt/archives
+          #sudo tee /etc/apt/apt.conf.d/80retry > /dev/null <<EOT
+          #Acquire::Retries "10";
+          #EOT
+          #sudo tee /etc/apt/apt.conf.d/80recommends > /dev/null <<EOT
+          #APT::Install-Recommends "false";
+          #EOT
+          #sudo tee /etc/apt/apt.conf.d/80suggests > /dev/null <<EOT
+          #APT::Install-Suggests "false";
+          #EOT
+          #sudo tee /etc/apt/apt.conf.d/80forceyes > /dev/null <<EOT
+          #APT::Get::Assume-Yes "true";
+          #EOT
+          #sudo tee /etc/apt/apt.conf.d/80fixmissing > /dev/null <<EOT
+          #APT::Get::Fix-Missing "true";
+          #EOT
+          #sudo rm -rf /var/lib/apt/lists/*
+          #sudo apt-get update
+          #sudo apt-get install debian-archive-keyring \
+                               #devscripts \
+                               #eatmydata \
+                               #git \
+                               #git-buildpackage \
+                               #pbuilder \
+                               #sudo
+          #sudo apt-get clean
+      #- name: Create baseline build environment
+        #run: |
+          #set -xe
+          #sudo tee /etc/pbuilderrc > /dev/null <<EOT
+          #APTCACHE=/tmp/pbuilder/aptcache/
+          #BASETGZ=/tmp/pbuilder/base.tgz
+          #BUILDPLACE=/tmp/pbuilder/build/
+          #BUILDRESULT=/tmp/pbuilder/result/
+          #EATMYDATA=YES
+          #COMPRESSPROG=cat
+          #EXTRAPACKAGES="eatmydata"
+          #AUTO_DEBSIGN=yes
+          #EOT
+          #mkdir -p /tmp/pbuilder/{aptcache,build,result}
+          #git-pbuilder create
+      #- uses: actions/checkout@v3
+        #name: Fetch our git repository
+        #with:
+          #path: 'halide-src'
+          #fetch-depth: 0
+      #- name: Refresh our copy of `main` branch from upstream halide git repository
+        #run: |
+          #set -xe
+          #cd "$GITHUB_WORKSPACE/halide-src/"
+          #git remote add upstream https://github.com/halide/Halide.git
+          #git fetch upstream main:refs/remotes/upstream/main
+          #git checkout -B main upstream/main
+          #git push -f origin
+      #- name: Prepare the package
+        #run: |
+          #set -xe
+          #cd "$GITHUB_WORKSPACE/halide-src/"
+          #git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
+          #git rebase main patch-queue/debian-nightly
+          #git push -f origin
+          #git checkout main
+          #test -e debian && echo "debian/ already exists." && exit 1
+          #git checkout origin/debian-nightly -- debian/
+          #test -e debian/patches && echo "debian/patches exists." && exit 1
+          #gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
+          #git checkout -B WIP
+          #git add debian/
+          #git commit -m "merge debian packaging"
+          #git merge -m "merge debian patches" patch-queue/debian-nightly
+      #- name: Build the package
+        #run: |
+          #set -xe
+          #cd "$GITHUB_WORKSPACE/halide-src/"
+          #gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-verbose
       - name: SUCCESS?
         run: |
           set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          ls -lah . || /bin/true
-          ls -lah .. || /bin/true
-          ls -lah ../.. || /bin/true
-          ls -lah /tmp/pbuilder/result || /bin/true
-          ls -lah /var/cache/pbuilder/result || /bin/true
+          mkdir "/tmp/pbuilder/result"
+          cd "/tmp/pbuilder/result"
+          echo HI > TEST
+          git init
+          git checkout -B packages/$DIST/halide
+          git add .
+          git commit -m "new halide snapshot for debian $DIST"
+          git remote add origin git@github.com:LebedevRI/TMP-publish.git
+          git push -f origin
