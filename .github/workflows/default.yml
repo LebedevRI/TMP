@@ -52,6 +52,7 @@ jobs:
                                gpg-agent \
                                gpgconf \
                                pbuilder \
+                               reprepro \
                                sudo
           sudo apt-get clean
       - name: Configure git/GPG/ssh
@@ -128,14 +129,23 @@ jobs:
           set -xe
           cd "$GITHUB_WORKSPACE/halide-src/"
           gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-compression=xz --git-compression-level=9 --git-verbose
-      - name: Store built package
+          ls -lah "/tmp/pbuilder/result"
+      - name: Prepare & publish apt repository with built packages
         run: |
           set -xe
-          cd "/tmp/pbuilder/result"
-          ls -lah
+          mkdir -p "$GITHUB_WORKSPACE/repository/$DIST/conf"
+          tee "$GITHUB_WORKSPACE/repository/$DIST/conf/distributions" > /dev/null <<EOT
+          Codename: halide
+          Architectures: amd64 source
+          Components: main
+          UDebComponents: main
+          SignWith: F948A40717A2BB9D0B39D15881BAA414C59F65D0
+          EOT
+          reprepro -V -b "$GITHUB_WORKSPACE/repository/$DIST/" include halide "/tmp/pbuilder/result/*.changes"
+          cd "$GITHUB_WORKSPACE/repository/"
           git init
-          git switch --orphan packages/$DIST/halide
+          git switch --orphan repository
           git add .
           git commit -m "halide snapshot for debian $DIST"
           git remote add origin git@github.com:LebedevRI/TMP-publish.git
-          git push -f --set-upstream origin packages/$DIST/halide
+          git push -f --set-upstream origin repository
