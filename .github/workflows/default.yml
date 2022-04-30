@@ -141,7 +141,7 @@ jobs:
           UDebComponents: main
           SignWith: F948A40717A2BB9D0B39D15881BAA414C59F65D0
           EOT
-          reprepro -V -b "$GITHUB_WORKSPACE/repository/$DIST/" include halide /tmp/pbuilder/result/*.changes
+          reprepro -V -b "$GITHUB_WORKSPACE/repository/$DIST/" --ignore=wrongdistribution include halide /tmp/pbuilder/result/*.changes
           cd "$GITHUB_WORKSPACE/repository/"
           git init
           git switch --orphan repository
