@@ -1,3 +1,13 @@
+halide (14.0.0-3) unstable; urgency=medium
+
+  [ Gianfranco Costamagna ]
+  * Team upload
+
+  [ James Addison ]
+  * Add libclang-rt-14-dev build dependency (Closes: #1027939)
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Mon, 23 Jan 2023 13:19:16 +0100
+
 halide (14.0.0-2) unstable; urgency=medium
 
   * Enable second PGO round (call-site-aware)
