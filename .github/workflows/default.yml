@@ -1,8 +1,8 @@
-name: Build Halide nightly amd64 deb package for debian unstable
+name: Build Halide amd64 deb package for debian unstable
 
 on:
   push:
-    branches: [ buildbot ]
+    branches: [ buildbot-debian ]
 
 jobs:
   linux:
@@ -10,11 +10,11 @@ jobs:
     env:
       BUILDER: pbuilder
       GIT_PBUILDER_OPTIONS: --mirror http://debian-archive.trafficmanager.net/debian --debootstrapopts "--variant=minbase" --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg"
-      GIT_PBUILDER_PDEBUILDOPTIONS: --use-pdebuild-internal --auto-debsign --buildresult /tmp/pbuilder/result
+      GIT_PBUILDER_PDEBUILDOPTIONS: --buildresult /tmp/pbuilder/result
       DIST: unstable
       DEBFULLNAME: Roman Lebedev
       DEBEMAIL: lebedev.ri@gmail.com
-      DEB_BUILD_OPTIONS: nolto nocheck nopgo
+      DEB_BUILD_OPTIONS: nolto nopgo
     steps:
       - name: Install necessary packages
         run: |
@@ -44,8 +44,10 @@ jobs:
           EOT
           sudo rm -rf /var/lib/apt/lists/*
           sudo apt-get update
-          sudo apt-get install debian-archive-keyring \
+          sudo apt-get install debhelper \
+                               debian-archive-keyring \
                                devscripts \
+                               dh-python \
                                eatmydata \
                                git \
                                git-buildpackage \
@@ -53,33 +55,9 @@ jobs:
                                gpgconf \
                                pbuilder \
                                reprepro \
-                               sudo
+                               sudo \
+                               xz-utils
           sudo apt-get clean
-      - name: Configure git/GPG/ssh
-        run: |
-          set -xe
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          mkdir -p ~/.gnupg
-          echo "9BD2035A6077B7F6A82A54631BBA3AB03A8A8E3C" >> ~/.gnupg/sshcontrol
-          echo "" >> ~/.gnupg/gpg-agent.conf
-          echo "enable-ssh-support" >> ~/.gnupg/gpg-agent.conf
-          gpgconf --kill gpg-agent
-          gpgconf --launch gpg-agent
-          export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
-          mkdir -p ~/.ssh
-          echo "IdentityAgent $SSH_AUTH_SOCK" >> ~/.ssh/config
-      - name: Import GPG key
-        id: import_gpg
-        uses: crazy-max/ghaction-import-gpg@v4
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          fingerprint: "F948A40717A2BB9D0B39D15881BAA414C59F65D0"
-          git_config_global: true
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          git_tag_gpgsign: true
-          git_push_gpgsign: "if-asked"
       - name: Create baseline build environment
         run: |
           set -xe
@@ -91,7 +69,6 @@ jobs:
           EATMYDATA=YES
           COMPRESSPROG=cat
           EXTRAPACKAGES="eatmydata"
-          AUTO_DEBSIGN=yes
           EOT
           mkdir -p /tmp/pbuilder/{aptcache,build,result}
           git-pbuilder create
@@ -100,52 +77,10 @@ jobs:
         with:
           path: 'halide-src'
           fetch-depth: 0
-      - name: Refresh our copy of `main` branch from upstream halide git repository
-        run: |
-          set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          git remote add upstream https://github.com/halide/Halide.git
-          git fetch upstream main:refs/remotes/upstream/main
-          git checkout -B main upstream/main
-          git push -f origin
-      - name: Prepare the package
-        run: |
-          set -xe
-          cd "$GITHUB_WORKSPACE/halide-src/"
-          git checkout -B patch-queue/debian-nightly origin/patch-queue/debian-nightly
-          git rebase main patch-queue/debian-nightly
-          git push -f origin
-          git checkout main
-          test -e debian && echo "debian/ already exists." && exit 1
-          git checkout origin/debian-nightly -- debian/
-          test -e debian/patches && echo "debian/patches exists." && exit 1
-          gbp dch --snapshot --debian-branch=main --since=HEAD --snapshot-number=`date -u +%Y%m%d%H%M%S`
-          git checkout -B WIP
-          git add debian/
-          git commit -m "merge debian packaging"
-          git merge -m "merge debian patches" patch-queue/debian-nightly
       - name: Build the package
         run: |
           set -xe
           cd "$GITHUB_WORKSPACE/halide-src/"
-          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-upstream-branch=main --git-debian-branch=WIP --git-compression=xz --git-compression-level=9 --git-verbose
+          git checkout -B debian origin/debian
+          gbp buildpackage --git-pbuilder --git-dist=$DIST --git-verbose
           ls -lah "/tmp/pbuilder/result"
-      - name: Prepare & publish apt repository with built packages
-        run: |
-          set -xe
-          mkdir -p "$GITHUB_WORKSPACE/repository/$DIST/conf"
-          tee "$GITHUB_WORKSPACE/repository/$DIST/conf/distributions" > /dev/null <<EOT
-          Codename: halide
-          Architectures: amd64 source
-          Components: main
-          UDebComponents: main
-          SignWith: F948A40717A2BB9D0B39D15881BAA414C59F65D0
-          EOT
-          reprepro -V -b "$GITHUB_WORKSPACE/repository/$DIST/" --ignore=wrongdistribution include halide /tmp/pbuilder/result/*.changes
-          cd "$GITHUB_WORKSPACE/repository/"
-          git init
-          git switch --orphan repository
-          git add .
-          git commit -m "halide snapshot for debian $DIST"
-          git remote add origin git@github.com:LebedevRI/TMP-publish.git
-          git push -f --set-upstream origin repository
