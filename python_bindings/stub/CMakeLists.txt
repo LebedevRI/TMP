@@ -9,7 +9,7 @@ target_link_libraries(Halide_PyStubs PRIVATE Halide::Halide $<BUILD_INTERFACE:py
 
 set_target_properties(Halide_PyStubs PROPERTIES
                       EXPORT_NAME PyStubs
-                      OUTPUT_NAME HalidePyStubs
+                      OUTPUT_NAME HalidePyStubs${Halide_VERSION_MAJOR}
                       CXX_VISIBILITY_PRESET hidden
                       VISIBILITY_INLINES_HIDDEN TRUE
                       POSITION_INDEPENDENT_CODE ON)
