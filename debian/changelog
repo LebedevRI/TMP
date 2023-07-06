@@ -1,3 +1,10 @@
+halide (16.0.0-1) unstable; urgency=medium
+
+  * New upstream major release.
+  * Build against LLVM16.
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Thu, 06 Jul 2023 21:04:39 +0300
+
 halide (14.0.0-3) unstable; urgency=medium
 
   [ Gianfranco Costamagna ]

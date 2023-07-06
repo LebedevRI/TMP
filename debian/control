@@ -12,13 +12,13 @@ Build-Depends: debhelper-compat (= 13),
                python3-imageio,
                cmake,
                ninja-build,
-               llvm-14,
-               llvm-14-dev,
-               clang-14,
-               libclang-14-dev,
-               libclang-rt-14-dev,
-               lld-14 [amd64 arm64 i386],
-               libomp-14-dev [!armel !mipsel !s390x !sparc64 !x32 !powerpc],
+               llvm-16,
+               llvm-16-dev,
+               clang-16,
+               libclang-16-dev,
+               libclang-rt-16-dev,
+               lld-16 [amd64 arm64 i386],
+               libomp-16-dev [!armel !mipsel !s390x !sparc64 !x32 !powerpc],
                libgl-dev,
                zlib1g-dev,
                libjpeg-dev,
@@ -33,7 +33,7 @@ Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian
 Vcs-Git: https://salsa.debian.org/pkg-llvm-team/halide.git -b debian
 Rules-Requires-Root: no
 
-Package: libhalide14-0
+Package: libhalide16-0
 Architecture: any
 Multi-Arch: same
 Section: libs
@@ -52,11 +52,11 @@ Description: fast, portable computation on images and tensors
  You can then compile this representation to an object file,
  or JIT-compile it and run it in the same process.
 
-Package: libhalideaot14-0
+Package: libhalideaot16-0
 Architecture: all
 Section: libs
 Depends: ${shlibs:Depends}, ${misc:Depends},
-         libllvm14
+         libllvm16
 Description: fast, portable computation on images and tensors (virtual library)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
@@ -69,38 +69,38 @@ Description: fast, portable computation on images and tensors (virtual library)
  .
  This is an empty package.
 
-Package: libhalide14-0-dev
+Package: libhalide16-0-dev
 Architecture: any
 Multi-Arch: same
 Section: libdevel
-Depends: libhalide14-0 (= ${binary:Version}),
+Depends: libhalide16-0 (= ${binary:Version}),
          ${shlibs:Depends}, ${misc:Depends},
-         llvm-14-dev
-Suggests: libhalide14-doc, halide14-api-doc
+         llvm-16-dev
+Suggests: libhalide16-doc, halide16-api-doc
 Description: fast, portable computation on images and tensors -- Development files
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
  .
  This package contains the files necessary to develop against libhalide.
 
-Package: libhalide14-doc
+Package: libhalide16-doc
 Architecture: all
 Multi-Arch: foreign
 Section: doc
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Enhances: libhalide14-0-dev
+Enhances: libhalide16-0-dev
 Description: fast, portable computation on images and tensors (C++ documentation)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
  .
  This package contains README's and tutorials for using Halide from C++.
 
-Package: halide14-api-doc
+Package: halide16-api-doc
 Architecture: all
 Multi-Arch: foreign
 Section: doc
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Enhances: libhalide14-0-dev
+Enhances: libhalide16-0-dev
 Description: fast, portable computation on images and tensors (Doxygen documentation)
  Halide is a programming language designed to make it easier to write
  high-performance image and array processing code on modern machines.
@@ -111,7 +111,7 @@ Package: python3-halide
 Architecture: any
 Multi-Arch: same
 Section: python
-Depends: libhalide14-0 (= ${binary:Version}),
+Depends: libhalide16-0 (= ${binary:Version}),
          ${shlibs:Depends}, ${misc:Depends},
          ${python3:Depends}
 Suggests: python3-halide-doc

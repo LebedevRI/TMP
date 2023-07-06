@@ -1,3 +1,4 @@
 0005-Remove-unrelevant-prebuild-binaries-to-pacify-lintia.patch
 0006-Fixup-libhalide-version-soversion-for-debian-package.patch
+0003-Fixup-libHalidePyStubs-version-soversion-for-debian-.patch
 0003-Effectively-disable-performance_boundary_conditions-.patch

@@ -1,0 +1,22 @@
+From: Roman Lebedev <lebedev.ri@gmail.com>
+Date: Fri, 7 Jul 2023 01:43:47 +0300
+Subject: Fixup libHalidePyStubs version/soversion for debian package
+
+Forwarded: not-needed
+---
+ python_bindings/stub/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python_bindings/stub/CMakeLists.txt b/python_bindings/stub/CMakeLists.txt
+index 42d71e0..9a6a2c8 100644
+--- a/python_bindings/stub/CMakeLists.txt
++++ b/python_bindings/stub/CMakeLists.txt
+@@ -9,7 +9,7 @@ target_link_libraries(Halide_PyStubs PRIVATE Halide::Halide $<BUILD_INTERFACE:py
+ 
+ set_target_properties(Halide_PyStubs PROPERTIES
+                       EXPORT_NAME PyStubs
+-                      OUTPUT_NAME HalidePyStubs
++                      OUTPUT_NAME HalidePyStubs${Halide_VERSION_MAJOR}
+                       CXX_VISIBILITY_PRESET hidden
+                       VISIBILITY_INLINES_HIDDEN TRUE
+                       POSITION_INDEPENDENT_CODE ON)

@@ -8,10 +8,10 @@ Forwarded: not-needed
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 809b3ef..ab2d2da 100644
+index 84f9803..5b23d80 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -391,8 +391,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
+@@ -440,8 +440,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
  
  set_target_properties(Halide PROPERTIES
                        POSITION_INDEPENDENT_CODE ON
@@ -20,5 +20,5 @@ index 809b3ef..ab2d2da 100644
 +                      SOVERSION ${Halide_SOVERSION_OVERRIDE}
 +                      OUTPUT_NAME Halide${Halide_VERSION_MAJOR})
  
- target_include_directories(Halide INTERFACE "$<BUILD_INTERFACE:${Halide_BINARY_DIR}/include>")
- add_dependencies(Halide HalideIncludes)
+ target_compile_definitions(Halide PUBLIC 
+                            HALIDE_VERSION=${Halide_VERSION} 
