@@ -1,3 +1,9 @@
+halide (16.0.0-2) unstable; urgency=medium
+
+  * Ignore failures of performance tests.
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Tue, 11 Jul 2023 22:39:59 +0300
+
 halide (16.0.0-1) unstable; urgency=medium
 
   * New upstream major release.

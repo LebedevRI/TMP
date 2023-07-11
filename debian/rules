@@ -89,7 +89,8 @@ APPS_BUILD_DIR = $(STAGE_BUILD_DIR_PREFIX)/halide-test-apps
 
 # Certain halide tests are sensitive to system load, and may be flaky.
 TEST_GROUPS_MULTITHREADED = multithreaded
-TEST_GROUPS_FLAKY = performance|auto_schedule
+TEST_GROUPS_PERFORMANCE = performance
+TEST_GROUPS_FLAKY = auto_schedule
 
 %:
 	dh $@ --with python3 --buildsystem=cmake+ninja
@@ -136,12 +137,14 @@ perform_stage_build:
 
 ifneq ($(WITH_TESTS),OFF)
 	# WARNING: running multi-threaded halide tests in parallel is unsupported!
-	# Non-multithreaded non-flaky tests.
-	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j$(shell nproc --all) --label-exclude "$(TEST_GROUPS_MULTITHREADED)|$(TEST_GROUPS_FLAKY)"                                         --output-on-failure --test-dir $(BUILD_DIR)
-	# Multi-threaded tests (excluding flaky tests).
-	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1                    --label-regex   "$(TEST_GROUPS_MULTITHREADED)" --label-exclude "$(TEST_GROUPS_FLAKY)"                       --output-on-failure --test-dir $(BUILD_DIR)
-	# All flaky tests (including multi-threaded tests).
-	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1                    --label-regex   "$(TEST_GROUPS_FLAKY)"                                                --repeat until-pass:5 --output-on-failure --test-dir $(BUILD_DIR)
+	# Non-multithreaded non-performance non-flaky tests.
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j$(shell nproc --all) --label-exclude "$(TEST_GROUPS_MULTITHREADED)|$(TEST_GROUPS_PERFORMANCE)|$(TEST_GROUPS_FLAKY)"                   --output-on-failure --test-dir $(BUILD_DIR)
+	# Multi-threaded tests (excluding performance and/or flaky tests).
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1                    --label-regex   "$(TEST_GROUPS_MULTITHREADED)" --label-exclude "$(TEST_GROUPS_PERFORMANCE)|$(TEST_GROUPS_FLAKY)" --output-on-failure --test-dir $(BUILD_DIR)
+	# All flaky tests (including multi-threaded tests, but excluding performance tests).
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1                    --label-regex   "$(TEST_GROUPS_FLAKY)" --label-exclude "$(TEST_GROUPS_PERFORMANCE)" --repeat until-pass:5        --output-on-failure --test-dir $(BUILD_DIR)
+	# Performance "tests". These are basically unreliable, so they may fail.
+	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) ctest -j1                    --label-regex   "$(TEST_GROUPS_PERFORMANCE)"                                                                     --output-on-failure --test-dir $(BUILD_DIR) || /bin/true
 endif
 
 	dh_auto_install --builddir=$(BUILD_DIR) --destdir=$(INSTALL_DIR)
