@@ -3,13 +3,13 @@ Section: devel
 Priority: optional
 Maintainer: Roman Lebedev <lebedev.ri@gmail.com>
 Build-Depends: debhelper-compat (= 13),
-               dh-python,
-               python3,
-               python3-dev,
-               libpython3-dev,
-               pybind11-dev,
-               python3-numpy,
-               python3-imageio,
+               dh-python [!i386],
+               python3 [!i386],
+               python3-dev [!i386],
+               libpython3-dev [!i386],
+               pybind11-dev [!i386],
+               python3-numpy [!i386],
+               python3-imageio [!i386],
                cmake,
                ninja-build,
                llvm-16,
@@ -34,7 +34,7 @@ Vcs-Git: https://salsa.debian.org/pkg-llvm-team/halide.git -b debian
 Rules-Requires-Root: no
 
 Package: libhalide16-0
-Architecture: any
+Architecture: any-i386 any-amd64 any-arm64
 Multi-Arch: same
 Section: libs
 Depends: ${shlibs:Depends}, ${misc:Depends}
@@ -70,7 +70,7 @@ Description: fast, portable computation on images and tensors (virtual library)
  This is an empty package.
 
 Package: libhalide16-0-dev
-Architecture: any
+Architecture: any-i386 any-amd64 any-arm64
 Multi-Arch: same
 Section: libdevel
 Depends: libhalide16-0 (= ${binary:Version}),
@@ -108,7 +108,7 @@ Description: fast, portable computation on images and tensors (Doxygen documenta
  This package contains Doxygen-generated API documentation.
 
 Package: python3-halide
-Architecture: any
+Architecture: any-amd64 any-arm64
 Multi-Arch: same
 Section: python
 Depends: libhalide16-0 (= ${binary:Version}),

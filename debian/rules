@@ -11,6 +11,7 @@ HALIDE_SOVERSION = 0
 
 LLVM_VERSION = 16
 
+WITH_PYTHON = ON
 WITH_LTO = OFF
 WITH_TESTS = ON
 WITH_PGO = OFF
@@ -24,6 +25,10 @@ ifeq ($(DEB_HOST_ARCH),amd64)
 endif
 
 ifeq ($(DEB_HOST_ARCH),i386)
+# The Python bindings aren't supported (or tested) on any 32-bit target.
+# https://github.com/halide/Halide/issues/7679#issuecomment-1632872124
+	WITH_PYTHON = OFF
+
 	WITH_LTO = ON
 	WITH_TESTS = ON
 	WITH_PGO = ON
@@ -93,7 +98,11 @@ TEST_GROUPS_PERFORMANCE = performance
 TEST_GROUPS_FLAKY = auto_schedule
 
 %:
+ifneq ($(WITH_PYTHON),OFF)
 	dh $@ --with python3 --buildsystem=cmake+ninja
+else
+	dh $@                --buildsystem=cmake+ninja
+endif
 
 perform_stage_build:
 	LLVM_PROFILE_FILE=$(LLVM_PROFILE_FILE) dh_auto_configure --sourcedir=$(SOURCE_DIR) --builddir=$(BUILD_DIR) -- \
@@ -106,8 +115,7 @@ perform_stage_build:
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	-DHalide_ENABLE_RTTI=ON \
 	-DHalide_ENABLE_EXCEPTIONS=ON \
-	-DWITH_PYTHON_BINDINGS=ON \
-	-DWITH_PYTHON_STUBS=ON \
+	-DWITH_PYTHON_BINDINGS=$(WITH_PYTHON) \
 	-DPYBIND11_USE_FETCHCONTENT=OFF \
 	-DHalide_REQUIRE_LLVM_VERSION=$(LLVM_VERSION) \
 	-DLLVM_DIR=/usr/lib/llvm-$(LLVM_VERSION)/lib/cmake/llvm \

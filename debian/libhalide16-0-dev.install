@@ -2,6 +2,5 @@ usr/include/halide16/
 usr/lib/*/cmake/Halide16/
 usr/lib/*/cmake/HalideHelpers16/
 usr/lib/*/halide16/
-usr/lib/*/libHalide16.so
-usr/lib/*/libHalidePyStubs16.a
+usr/lib/*/libHalide*16.*[ao]
 usr/src/halide16/
