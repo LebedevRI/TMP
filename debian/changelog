@@ -1,6 +1,7 @@
 halide (16.0.0-2) unstable; urgency=medium
 
   * Ignore failures of performance tests.
+  * Correctly detect `_Float16` as not supported on i386
 
  -- Roman Lebedev <lebedev.ri@gmail.com>  Tue, 11 Jul 2023 22:39:59 +0300
 
