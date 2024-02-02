@@ -28,7 +28,7 @@ Build-Depends: debhelper-compat (= 13),
                libopenblas-dev   [!armel !mipsel !x32],
                libatlas-base-dev [ armel  mipsel  ],
                libflatbuffers-dev
-Standards-Version: 4.6.0
+Standards-Version: 4.6.2
 Homepage: https://halide-lang.org/
 Vcs-Browser: https://salsa.debian.org/pkg-llvm-team/halide/-/tree/debian
 Vcs-Git: https://salsa.debian.org/pkg-llvm-team/halide.git -b debian

@@ -1,3 +1,9 @@
+halide (17.0.0-2) UNRELEASED; urgency=low
+
+  Update standards version to 4.6.2, no changes needed.
+
+ -- Sylvestre Ledru <sylvestre@debian.org>  Fri, 02 Feb 2024 07:59:17 +0000
+
 halide (17.0.0-1) unstable; urgency=medium
 
   * New upstream major release.
