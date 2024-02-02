@@ -8,10 +8,10 @@ Forwarded: not-needed
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 84f9803..5b23d80 100644
+index 390fee9..94cff31 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -440,8 +440,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
+@@ -542,8 +542,8 @@ mark_as_advanced(Halide_SOVERSION_OVERRIDE)
  
  set_target_properties(Halide PROPERTIES
                        POSITION_INDEPENDENT_CODE ON
@@ -20,5 +20,5 @@ index 84f9803..5b23d80 100644
 +                      SOVERSION ${Halide_SOVERSION_OVERRIDE}
 +                      OUTPUT_NAME Halide${Halide_VERSION_MAJOR})
  
- target_compile_definitions(Halide PUBLIC 
-                            HALIDE_VERSION=${Halide_VERSION} 
+ # Note that we (deliberately) redeclare these versions here, even though the macros
+ # with identical versions are expected to be defined in source; this allows us to

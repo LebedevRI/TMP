@@ -1,3 +1,10 @@
+halide (17.0.0-1) unstable; urgency=medium
+
+  * New upstream major release.
+  * Build against LLVM17.
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Fri, 02 Feb 2024 03:34:49 +0300
+
 halide (16.0.0-3) unstable; urgency=medium
 
   * Explicitly disable python bindings on i386, unsupported upstream,

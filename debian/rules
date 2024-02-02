@@ -5,11 +5,11 @@ include /usr/share/dpkg/architecture.mk
 # We do not care about distro's LTO preferences.
 DEB_BUILD_MAINT_OPTIONS += optimize=-lto
 
-HALIDE_VERSION = 16
+HALIDE_VERSION = 17
 
 HALIDE_SOVERSION = 0
 
-LLVM_VERSION = 16
+LLVM_VERSION = 17
 
 WITH_PYTHON = ON
 WITH_LTO = OFF
@@ -116,6 +116,7 @@ perform_stage_build:
 	-DHalide_ENABLE_RTTI=ON \
 	-DHalide_ENABLE_EXCEPTIONS=ON \
 	-DWITH_PYTHON_BINDINGS=$(WITH_PYTHON) \
+	-DFLATBUFFERS_USE_FETCHCONTENT=OFF \
 	-DPYBIND11_USE_FETCHCONTENT=OFF \
 	-DHalide_REQUIRE_LLVM_VERSION=$(LLVM_VERSION) \
 	-DLLVM_DIR=/usr/lib/llvm-$(LLVM_VERSION)/lib/cmake/llvm \

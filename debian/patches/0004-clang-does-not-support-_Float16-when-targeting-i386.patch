@@ -8,10 +8,10 @@ See https://github.com/halide/Halide/issues/7678
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/runtime/HalideRuntime.h b/src/runtime/HalideRuntime.h
-index 522b9ff..70b7f38 100644
+index eea4faf..d7e481c 100644
 --- a/src/runtime/HalideRuntime.h
 +++ b/src/runtime/HalideRuntime.h
-@@ -82,7 +82,7 @@ extern "C" {
+@@ -91,7 +91,7 @@ extern "C" {
  // Ideally there would be a better way to detect if the type
  // is supported, even in a compiler independent fashion, but
  // coming up with one has proven elusive.
