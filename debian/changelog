@@ -1,3 +1,19 @@
+halide (18.0.0-3) unstable; urgency=medium
+
+  * `python3-halide` is not `MA:same`/co-installable, don't mark it as such.
+  * Add missing dependency from `libhalide18-dev` on `python3-halide`,
+    if latter is not present CMake's `find_package(Halide)` fails.
+  * This `libhalide-dev` also becomes non `MA:same`/co-installable...
+  * Build `Halide::PyStub` library without LTO, so that after install
+    it can actually be linked against.
+  * The previous point seems to finally break DWZ, so disable it,
+    similarly to LibreOffice's package.
+  * Finally, add some autopkgtests!
+  * Update standards-version to 4.7.0, no changes needed.
+  * Reorder patches.
+
+ -- Roman Lebedev <lebedev.ri@gmail.com>  Wed, 31 Jul 2024 20:03:21 +0300
+
 halide (18.0.0-2) unstable; urgency=medium
 
   * Re-silence failures of flaky tests (Closes: #1076968)

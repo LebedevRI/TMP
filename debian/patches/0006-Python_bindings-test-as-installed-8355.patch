@@ -1,0 +1,89 @@
+From: Roman Lebedev <lebedev.ri@gmail.com>
+Date: Wed, 31 Jul 2024 19:15:47 +0300
+Subject: `Python_bindings`-test-as-installed (#8355)
+
+Support not building python bindings, while running python tests
+against installed halide, and call `enable_testing()` there
+so that `ctest` can work.
+
+(cherry picked from commit 423df3c50b4b5c9b05b6b2cae16aff535dcf81c0)
+
+Forwarded: https://github.com/halide/Halide/pull/8355
+---
+ python_bindings/CMakeLists.txt | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
+
+diff --git a/python_bindings/CMakeLists.txt b/python_bindings/CMakeLists.txt
+index 25f61fe..d7c1c6b 100644
+--- a/python_bindings/CMakeLists.txt
++++ b/python_bindings/CMakeLists.txt
+@@ -1,6 +1,10 @@
+ cmake_minimum_required(VERSION 3.22...3.23)
+ project(Halide_Python)
+ 
++if (PROJECT_IS_TOP_LEVEL)
++    enable_testing()
++endif ()
++
+ include(CMakeDependentOption)
+ 
+ ##
+@@ -12,6 +16,11 @@ set(CMAKE_CXX_STANDARD 17 CACHE STRING "The minimum C++ standard to use")
+ option(CMAKE_CXX_STANDARD_REQUIRED "Prevent CMake C++ standard selection decay" ON)
+ option(CMAKE_CXX_EXTENSIONS "Enable C++ vendor extensions (e.g. GNU)" OFF)
+ 
++# Support not actually building the bindings, but using the ones we find
++# via `find_package(Halide)`. This allows running tests against the
++# installed Halide package.
++option(WITH_PYTHON_BINDINGS "Build Python bindings" ON)
++
+ # Duplicated options from parent project
+ option(WITH_TESTS "Build tests" ON)
+ option(WITH_TUTORIALS "Build tutorials" ON)
+@@ -41,18 +50,22 @@ if (Python3_VERSION VERSION_LESS "3.8")
+ endif ()
+ message(STATUS "Found Python ${Python3_VERSION} at ${Python3_EXECUTABLE}")
+ 
+-if (PYBIND11_USE_FETCHCONTENT)
+-    include(FetchContent)
+-    FetchContent_Declare(
+-        pybind11
+-        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+-        GIT_TAG v${PYBIND11_VER}
+-    )
+-    FetchContent_MakeAvailable(pybind11)
+-else ()
+-    find_package(pybind11 ${PYBIND11_VER} REQUIRED)
++if (WITH_PYTHON_BINDINGS)
++    # If we are actually going to build the bindings, we need pybind11.
++    if (PYBIND11_USE_FETCHCONTENT)
++        include(FetchContent)
++        FetchContent_Declare(
++            pybind11
++            GIT_REPOSITORY https://github.com/pybind/pybind11.git
++            GIT_TAG v${PYBIND11_VER}
++        )
++        FetchContent_MakeAvailable(pybind11)
++    else ()
++        find_package(pybind11 ${PYBIND11_VER} REQUIRED)
++    endif ()
+ endif ()
+ 
++# Note: this must happen, especially when WITH_PYTHON_BINDINGS is OFF.
+ find_package(Halide REQUIRED Halide)
+ if (NOT Halide_ENABLE_RTTI OR NOT Halide_ENABLE_EXCEPTIONS)
+     message(FATAL_ERROR "Python bindings require RTTI and exceptions to be enabled.")
+@@ -91,9 +104,11 @@ endfunction()
+ # Add our sources to this sub-tree.
+ ##
+ 
+-add_subdirectory(src)
++if (WITH_PYTHON_BINDINGS)
++    add_subdirectory(src)
++endif ()
+ 
+-if (WITH_PYTHON_STUBS)
++if (WITH_PYTHON_BINDINGS AND WITH_PYTHON_STUBS)
+     add_subdirectory(stub)
+ endif ()
+ 

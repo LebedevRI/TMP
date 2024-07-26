@@ -3,7 +3,7 @@
 include /usr/share/dpkg/architecture.mk
 
 # We do not care about distro's LTO preferences.
-DEB_BUILD_MAINT_OPTIONS += optimize=-lto
+export DEB_BUILD_MAINT_OPTIONS += optimize=-lto
 
 HALIDE_VERSION = 18
 
@@ -65,10 +65,7 @@ BUILDSPACE = $(SOURCE_DIR)-build
 BUILD_STAGE ?= 2
 STAGE_COMPILE_FLAGS ?=
 
-CFLAGS = -g
-
-# DWZ supports, at most, DWARF4, while the default is DWARF5.
-CFLAGS += -fdebug-default-version=4
+CFLAGS = -fdebug-default-version=5 -g -gz -gsplit-dwarf -Wl,--gdb-index
 
 CFLAGS += $(STAGE_COMPILE_FLAGS)
 
@@ -212,6 +209,9 @@ override_dh_auto_install:
 
 override_dh_install:
 	dh_install --sourcedir=$(INSTALL_DIR)
+
+override_dh_dwz:
+	# dwz does not really support clang/LLVM-produced debug info.
 
 override_dh_clean:
 	dh_clean

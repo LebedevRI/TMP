@@ -68,7 +68,7 @@ License: BSD-3-clause
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Files: debian/*
-Copyright: 2021 Roman Lebedev <lebedev.ri@gmail.com>
+Copyright: 2021-2024 Roman Lebedev <lebedev.ri@gmail.com>
 License: GPL-2+
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

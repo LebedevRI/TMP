@@ -2,5 +2,6 @@ usr/include/halide18/
 usr/lib/*/cmake/Halide18/
 usr/lib/*/cmake/HalideHelpers18/
 usr/lib/*/halide18/
-usr/lib/*/libHalide*18.*[ao]
+usr/lib/*/libHalide18.so
+usr/lib/*/libHalidePyStubs18.a
 usr/src/halide18/
